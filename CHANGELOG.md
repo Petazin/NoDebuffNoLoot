@@ -1,10 +1,10 @@
 # Changelog - NoDebuffNoLoot
 
-## [1.1.0] - 2026-01-28
+## [1.2.0] - 2026-01-28
 ### Added
-- Nuevo menú de configuración accesible via `/ndnl`.
-- Sistema de asignación directa de jugadores a debuffs desde la interfaz.
-- Comando de chat `/ndnl` para facilitar el acceso.
-- Carga dinámica de opciones basada en la base de datos de debuffs.
+- Sincronización de raid mediante `AceComm-3.0`.
+- Comando `/ndnlsync` para forzar la sincronización manual de asignaciones.
+- Alertas visuales en pantalla (`UIErrorsFrame`) cuando falta un debuff asignado al jugador local.
+- Alertas de "Debuff a punto de expirar" (< 5 segundos).
 
-## [1.0.0] - 2026-01-28
+## [1.1.0] - 2026-01-28

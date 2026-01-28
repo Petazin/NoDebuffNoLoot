@@ -30,8 +30,12 @@ function NoDebuffNoLoot:OnInitialize()
         ns.UI:Init()
     end
 
+    -- Registrar Comm
+    self:RegisterComm("NDNL_SYNC", function(...) ns.Assignments:OnCommReceived(...) end)
+
     self:RegisterChatCommand("ndnl", "OpenOptions")
-    self:Print("Cargado correctamente. v1.1.0. Escribe /ndnl para configurar.")
+    self:RegisterChatCommand("ndnlsync", function() ns.Assignments:PushConfiguration() end)
+    self:Print("Cargado correctamente. v1.2.0. Escribe /ndnl para configurar.")
 end
 
 function NoDebuffNoLoot:OpenOptions()
@@ -80,9 +84,26 @@ function NoDebuffNoLoot:UpdateTracker()
             if name then
                 local timeLeft = expirationTime > 0 and (expirationTime - GetTime()) or 999
                 ns.UI:SetStatus(debuffName, "ACTIVE", timeLeft, assignedPlayer, icon or info.icon)
+                
+                -- Alerta si va a expirar y el jugador es el local
+                if assignedPlayer == UnitName("player") and timeLeft < 5 and not info.alertSent then
+                    UIErrorsFrame:AddMessage("¡TU DEBUFF EXPIRA: " .. debuffName .. "!", 1.0, 1.0, 0.0)
+                    info.alertSent = true
+                elseif timeLeft >= 5 then
+                    info.alertSent = false
+                end
             else
                 ns.UI:SetStatus(debuffName, "MISSING", 0, assignedPlayer, info.icon)
+                
+                -- Alerta si falta y el jugador es el local
+                if assignedPlayer == UnitName("player") and not info.missingAlertSent then
+                    UIErrorsFrame:AddMessage("¡FALTA TU DEBUFF: " .. debuffName .. "!", 1.0, 0.0, 0.0)
+                    info.missingAlertSent = true
+                end
             end
+            
+            -- Si el debuff aparece, resetear alerta de missing
+            if name then info.missingAlertSent = false end
         end
     end
 end
