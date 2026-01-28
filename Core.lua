@@ -22,12 +22,21 @@ function NoDebuffNoLoot:OnInitialize()
     -- Inicializar DB
     self.db = LibStub("AceDB-3.0"):New("NoDebuffNoLootDB", defaults, true)
     
+    -- Inicializar Opciones
+    self:SetupOptions()
+    
     -- Inicializar UI
     if ns.UI and ns.UI.Init then
         ns.UI:Init()
     end
 
-    self:Print("Cargado correctamente. v1.0.0")
+    self:RegisterChatCommand("ndnl", "OpenOptions")
+    self:Print("Cargado correctamente. v1.1.0. Escribe /ndnl para configurar.")
+end
+
+function NoDebuffNoLoot:OpenOptions()
+    InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
+    InterfaceOptionsFrame_OpenToCategory(self.optionsFrame) -- Doble llamada para bug de Blizzard
 end
 
 function NoDebuffNoLoot:OnEnable()
