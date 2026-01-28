@@ -5,6 +5,10 @@ task.md
 ROADMAP.md
 .gemini/
 
+# Reportes técnicos y validaciones
+Validation_Report_*.md
+Manual_Test_Plan_*.md
+
 # Archivos de la interfaz de WoW (opcional, pero recomendado)
 *.bak
 *.old
