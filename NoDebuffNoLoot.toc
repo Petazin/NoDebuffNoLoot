@@ -2,7 +2,7 @@
 ## Title: NoDebuffNoLoot
 ## Notes: Identifica debuffs faltantes en bosses y los asigna a jugadores específicos.
 ## Author: Antigravity & User
-## Version: 1.0.0
+## Version: 2.0.0
 ## SavedVariables: NoDebuffNoLootDB
 
 # Librerías
@@ -15,6 +15,9 @@ Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 Libs\AceComm-3.0\AceComm-3.0.xml
+
+Locales\enUS.lua
+Locales\esES.lua
 
 Data.lua
 Core.lua

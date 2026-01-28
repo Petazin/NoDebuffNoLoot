@@ -1,5 +1,7 @@
 local addonName, ns = ...
 
+local L = LibStub("AceLocale-3.0"):GetLocale("NoDebuffNoLoot")
+
 local options = {
     name = "NoDebuffNoLoot",
     handler = NoDebuffNoLoot,
@@ -7,18 +9,18 @@ local options = {
     args = {
         general = {
             type = 'group',
-            name = "Configuración General",
+            name = L["SHOW_HUD"],
             order = 1,
             args = {
                 desc = {
                     type = "description",
-                    name = "Asigna jugadores a cada debuff crítico para rastrear su presencia en el boss.",
+                    name = L["ASSIGNMENTS_DESC"],
                     order = 1,
                 },
                 showHud = {
                     type = "toggle",
-                    name = "Mostrar HUD",
-                    desc = "Muestra u oculta el panel de debuffs.",
+                    name = L["SHOW_HUD"],
+                    desc = L["SHOW_HUD_DESC"],
                     get = function() return NoDebuffNoLoot.db.profile.hud.shown end,
                     set = function(_, val) 
                         NoDebuffNoLoot.db.profile.hud.shown = val 
@@ -30,27 +32,28 @@ local options = {
         },
         assignments = {
             type = 'group',
-            name = "Asignaciones",
+            name = L["ASSIGNMENTS"],
             order = 2,
-            args = {
-                -- Se llenará dinámicamente o por clase
-            },
+            args = {},
         },
     },
 }
 
--- Función para generar los controles de asignación dinámicamente
 function NoDebuffNoLoot:SetupOptions()
     for name, info in pairs(ns.Data.Debuffs) do
         options.args.assignments.args[name:gsub("%s+", "")] = {
             type = 'input',
             name = name,
-            desc = "Nombre del jugador responsable de este debuff.",
+            desc = L["PLAYER_NAME_DESC"],
             get = function() return self.db.profile.assignments[name] or "" end,
             set = function(_, val) 
                 if val == "" then val = nil end
                 self.db.profile.assignments[name] = val
                 self:UpdateTracker()
+                -- Auto-sync on change
+                if ns.Assignments and ns.Assignments.PushConfiguration then
+                    ns.Assignments:PushConfiguration()
+                end
             end,
             order = 10,
         }

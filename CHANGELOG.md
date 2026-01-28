@@ -1,10 +1,33 @@
 # Changelog - NoDebuffNoLoot
 
+## [2.0.0] - 2026-01-28
+### Added
+- **Multi-Language Support**: Full implementation of `AceLocale-3.0` with initial support for English (`enUS`) and Spanish (`esES`/`esMX`).
+- **Alert Optimization**: Redesigned warning system to avoid data contamination and ensure optimal performance.
+
+### Changed
+- **Code Refactoring**: Improved file organization for easier future maintenance.
+- **Automatic Sync**: The system now attempts to sync assignments immediately after editing them in the menu.
+
 ## [1.2.0] - 2026-01-28
 ### Added
-- Sincronización de raid mediante `AceComm-3.0`.
-- Comando `/ndnlsync` para forzar la sincronización manual de asignaciones.
-- Alertas visuales en pantalla (`UIErrorsFrame`) cuando falta un debuff asignado al jugador local.
-- Alertas de "Debuff a punto de expirar" (< 5 segundos).
+- Raid synchronization via `AceComm-3.0`.
+- `/ndnlsync` chat command to force manual assignment synchronization.
+- On-screen visual alerts (`UIErrorsFrame`) when a debuff assigned to the local player is missing.
+- "Debuff about to expire" alerts (< 5 seconds).
 
 ## [1.1.0] - 2026-01-28
+### Added
+- New configuration menu accessible via `/ndnl`.
+- Direct player assignment system for debuffs from the UI.
+- `/ndnl` chat command for easier access.
+- Dynamic options loading based on the debuff database.
+
+## [1.0.0] - 2026-01-28
+### Added
+- Project initialization.
+- Core structure creation (Core, Data, UI, Assignments).
+- Critical TBC debuffs definition.
+- Included Ace3 libraries for total addon independence.
+- `.gitignore` configuration for internal file protection.
+- Initial synchronization with GitHub.
