@@ -1,0 +1,10 @@
+# Archivos de gestión local
+GEMINI.md
+agent_activity.log
+task.md
+ROADMAP.md
+.gemini/
+
+# Archivos de la interfaz de WoW (opcional, pero recomendado)
+*.bak
+*.old
