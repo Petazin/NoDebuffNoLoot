@@ -36,6 +36,14 @@ function NoDebuffNoLoot:OnInitialize()
     self:Print(L["TRACKER_LOADED"])
 end
 
+function NoDebuffNoLoot:OpenOptions()
+    if self.optionsFrame then
+        -- Doble llamada para mitigar el bug de Blizzard en el panel de opciones
+        InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
+        InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
+    end
+end
+
 function NoDebuffNoLoot:OnEnable()
     self:RegisterEvent("UNIT_AURA")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")

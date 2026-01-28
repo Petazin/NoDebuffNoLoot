@@ -1,5 +1,9 @@
 # Changelog - NoDebuffNoLoot
 
+## [2.0.1] - 2026-01-28
+### Fixed
+- **Hotfix**: Solucionado error de Lua al ejecutar `/ndnl` causado por una función omitida en la v2.0.0.
+
 ## [2.0.0] - 2026-01-28
 ### Added
 - **Multi-Language Support**: Full implementation of `AceLocale-3.0` with initial support for English (`enUS`) and Spanish (`esES`/`esMX`).
