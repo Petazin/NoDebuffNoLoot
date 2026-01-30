@@ -1,5 +1,10 @@
 # Changelog - NoDebuffNoLoot
 
+## [2.0.2] - 2026-01-30
+### Added
+- **Public Beta**: Preparación para el lanzamiento en CurseForge y GitHub para pruebas comunitarias.
+- **Documentation**: Actualizado el plan de pruebas para reflejar el estado actual.
+
 ## [2.0.1] - 2026-01-28
 ### Fixed
 - **Hotfix**: Solucionado error de Lua al ejecutar `/ndnl` causado por una función omitida en la v2.0.0.

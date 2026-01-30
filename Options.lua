@@ -41,9 +41,12 @@ local options = {
 
 function NoDebuffNoLoot:SetupOptions()
     for name, info in pairs(ns.Data.Debuffs) do
-        options.args.assignments.args[name:gsub("%s+", "")] = {
+        local localizedName, _, icon = GetSpellInfo(info.id)
+        local displayName = localizedName or name
+        
+        options.args.assignments.args[name:gsub("[%s']+", "")] = {
             type = 'input',
-            name = name,
+            name = "|T" .. (icon or "") .. ":16|t " .. displayName,
             desc = L["PLAYER_NAME_DESC"],
             get = function() return self.db.profile.assignments[name] or "" end,
             set = function(_, val) 

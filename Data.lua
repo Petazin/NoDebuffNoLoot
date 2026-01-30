@@ -15,11 +15,18 @@ ns.Data.Debuffs = {
     -- Hunter
     ["Hunter's Mark"] = { id = 14325, class = "HUNTER", icon = "Interface\\Icons\\Ability_Hunter_Snares" },
     ["Scorpid Sting"] = { id = 3043, class = "HUNTER", icon = "Interface\\Icons\\Ability_Hunter_CriticalShot" },
+    ["Viper Sting"] = { id = 3034, class = "HUNTER", icon = "Interface\\Icons\\Ability_Hunter_AimedShot" },
+    ["Serpent Sting"] = { id = 27019, class = "HUNTER", icon = "Interface\\Icons\\Ability_Hunter_Quickshot" },
+
+    -- Chamán
+    ["Stormstrike"] = { id = 17364, class = "SHAMAN", icon = "Interface\\Icons\\Spell_Holy_SealOfMight" },
+    ["Flame Shock"] = { id = 25457, class = "SHAMAN", icon = "Interface\\Icons\\Spell_Fire_FlameShock" },
+    ["Earth Shock"] = { id = 25454, class = "SHAMAN", icon = "Interface\\Icons\\Spell_Nature_EarthShock" },
 
     -- Paladín
-    ["Judgement of Light"] = { id = 27163, class = "PALADIN", icon = "Interface\\Icons\\Spell_Holy_RighteousnessAura" },
+    ["Judgement of Light"] = { id = 27163, class = "PALADIN", icon = "Interface\\Icons\\Spell_Holy_DivineIntervention" },
     ["Judgement of Wisdom"] = { id = 27164, class = "PALADIN", icon = "Interface\\Icons\\Spell_Holy_RighteousnessAura" },
-    ["Judgement of the Crusader"] = { id = 27159, class = "PALADIN", icon = "Interface\\Icons\\Spell_Holy_RighteousnessAura" },
+    ["Judgement of the Crusader"] = { id = 27159, class = "PALADIN", icon = "Interface\\Icons\\Spell_Holy_HolySmite" },
 
     -- Warlock
     ["Curse of Elements"] = { id = 27228, class = "WARLOCK", icon = "Interface\\Icons\\Spell_Shadow_ChillTouch" },

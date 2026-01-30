@@ -2,6 +2,8 @@ local addonName, ns = ...
 local UI = {}
 ns.UI = UI
 
+local L = LibStub("AceLocale-3.0"):GetLocale("NoDebuffNoLoot")
+
 local frame
 
 function UI:Init()
@@ -57,16 +59,18 @@ function UI:SetStatus(debuffName, status, timeLeft, assignedPlayer, iconPath)
     row:Show()
     row.icon:SetTexture(iconPath)
     
-    local color = "|cFFFFFFFF" -- Blanco por defecto
     if status == "MISSING" then
         color = "|cFFFF0000" -- Rojo
+        statusText = L["STATUS_MISSING"]
     elseif timeLeft < 5 then
         color = "|cFFFFFF00" -- Amarillo
+        statusText = string.format("%s: %.1fs", L["STATUS_ACTIVE"], timeLeft)
     else
         color = "|cFF00FF00" -- Verde
+        statusText = string.format("%s: %.1fs", L["STATUS_ACTIVE"], timeLeft)
     end
     
-    row.text:SetText(string.format("%s%s (%s)|r", color, debuffName, assignedPlayer))
+    row.text:SetText(string.format("%s%s (%s)|r - %s", color, debuffName, assignedPlayer, statusText))
     
     -- Ajustar posiciones de filas
     local i = 0
