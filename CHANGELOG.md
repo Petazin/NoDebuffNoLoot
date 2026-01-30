@@ -1,5 +1,10 @@
 # Changelog - NoDebuffNoLoot
 
+## [2.0.3] - 2026-01-30
+### Fixed
+- **CurseForge Integration**: Añadido Project ID para la subida automática.
+- **Visuals**: Incluida imagen oficial de marca `logo.png`.
+
 ## [2.0.2] - 2026-01-30
 ### Added
 - **Public Beta**: Preparación para el lanzamiento en CurseForge y GitHub para pruebas comunitarias.
