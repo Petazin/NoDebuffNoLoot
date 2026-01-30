@@ -1,5 +1,7 @@
 # NoDebuffNoLoot (TBC)
 
+![NoDebuffNoLoot Logo](logo.png)
+
 Addon designed to optimize raid performance in World of Warcraft TBC by strictly tracking critical debuffs on bosses.
 
 ## What does NoDebuffNoLoot do?
@@ -46,6 +48,8 @@ From the configuration panel (`/ndnl`), you can:
 ---
 
 # NoDebuffNoLoot (TBC)
+
+![NoDebuffNoLoot Logo](logo.png)
 
 Addon diseñado para optimizar el rendimiento de las raids en World of Warcraft TBC mediante el rastreo estricto de los debuffs críticos en jefes.
 
