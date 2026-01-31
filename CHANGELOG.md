@@ -1,4 +1,12 @@
-# Changelog - NoDebuffNoLoot
+## [2.1.0] - 2026-01-31
+### Added
+- **Quick Wins**: Implemented "Quality of Life" improvement package.
+- **Visual & Auditory Alerts**: Red screen flash and "Raid Warning" sound for critical missing debuffs (configurable).
+- **Chat Logs**: Textual log in chat window when an assigned debuff is missed.
+- **LDB Support**: Integration with LibDataBroker (Titan Panel, Minimap Button) as optional dependency.
+
+### Changed
+- **Defaults**: Visual and chat alerts enabled by default.
 
 ## [2.0.4] - 2026-01-31
 ### Added

@@ -28,6 +28,64 @@ local options = {
                     end,
                     order = 2,
                 },
+                lockHud = {
+                    type = "toggle",
+                    name = "Lock HUD",
+                    desc = "Lock the HUD frame to prevent moving",
+                    get = function() return NoDebuffNoLoot.db.profile.hud.locked end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.locked = val
+                        ns.UI:SetLocked(val)
+                    end,
+                    order = 3,
+                },
+                alertsHeader = {
+                    type = "header",
+                    name = "Alerts & Notifications",
+                    order = 10,
+                },
+                alertChat = {
+                    type = "toggle",
+                    name = "Chat Alerts",
+                    desc = "Print alerts to chat window",
+                    get = function() return NoDebuffNoLoot.db.profile.alerts.chat end,
+                    set = function(_, val) NoDebuffNoLoot.db.profile.alerts.chat = val end,
+                    order = 11,
+                },
+                alertSound = {
+                    type = "toggle",
+                    name = "Sound Alerts",
+                    desc = "Play sounds on alert",
+                    get = function() return NoDebuffNoLoot.db.profile.alerts.sound end,
+                    set = function(_, val) NoDebuffNoLoot.db.profile.alerts.sound = val end,
+                    order = 12,
+                },
+                alertFlash = {
+                    type = "toggle",
+                    name = "Screen Flash",
+                    desc = "Flash screen borders on critical missing debuffs",
+                    get = function() return NoDebuffNoLoot.db.profile.alerts.visual_flash end,
+                    set = function(_, val) NoDebuffNoLoot.db.profile.alerts.visual_flash = val end,
+                    order = 13,
+                },
+                minimapHeader = {
+                    type = "header",
+                    name = "Minimap Icon",
+                    order = 20,
+                },
+                minimapIcon = {
+                    type = "toggle",
+                    name = "Show Minimap Icon",
+                    desc = "Toggle the minimap button (requires Reload)",
+                    get = function() return not NoDebuffNoLoot.db.profile.minimap.hide end,
+                    set = function(_, val) 
+                        NoDebuffNoLoot.db.profile.minimap.hide = not val
+                        if ns.LDBIcon then
+                            if val then ns.LDBIcon:Show("NoDebuffNoLoot") else ns.LDBIcon:Hide("NoDebuffNoLoot") end
+                        end
+                    end,
+                    order = 21,
+                },
             },
         },
         assignments = {

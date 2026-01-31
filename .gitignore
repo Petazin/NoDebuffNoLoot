@@ -12,3 +12,6 @@ Manual_Test_Plan_*.md
 # Archivos de la interfaz de WoW (opcional, pero recomendado)
 *.bak
 *.old
+
+# Ideas
+Locales/lluvia_de_ideas.md

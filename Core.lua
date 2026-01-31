@@ -34,6 +34,14 @@ local defaults = {
             x = 0,
             y = 0,
         },
+        alerts = {
+            chat = true,
+            sound = true,
+            visual_flash = true,
+        },
+        minimap = {
+            hide = false,
+        },
     },
 }
 
@@ -156,10 +164,23 @@ function NoDebuffNoLoot:UpdateTracker()
             else
                 ns.UI:SetStatus(debuffName, "MISSING", 0, assignedPlayer, info.icon)
                 
-                -- Alerta de missing
+                -- Alerta de missing (Solo si estamos en combate)
                 if assignedPlayer == playerName then
-                    if not alertStates[debuffName].missing then
-                        UIErrorsFrame:AddMessage(string.format(L["ALERT_MISSING"], debuffName), 1.0, 0.0, 0.0)
+                    -- Resetear estado si no estamos en combate para permitir re-alerta al iniciar
+                    if not InCombatLockdown() then
+                        alertStates[debuffName].missing = false
+                    elseif not alertStates[debuffName].missing then
+                         UIErrorsFrame:AddMessage(string.format(L["ALERT_MISSING"], debuffName), 1.0, 0.0, 0.0)
+                        
+                        -- Chat Log Alert
+                        if self.db.profile.alerts.chat then
+                            self:Print(string.format(L["ALERT_MISSING"], debuffName))
+                        end
+
+                        if ns.UI and ns.UI.FlashScreen then
+                             ns.UI:FlashScreen()
+                        end
+                        
                         alertStates[debuffName].missing = true
                     end
                 end

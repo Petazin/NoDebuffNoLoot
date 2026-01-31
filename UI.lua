@@ -25,6 +25,64 @@ function UI:Init()
     
     frame.rows = {}
     frame:Hide()
+    
+    -- Aplicar estado inicial de bloqueo
+    if NoDebuffNoLoot and NoDebuffNoLoot.db then
+        self:SetLocked(NoDebuffNoLoot.db.profile.hud.locked)
+    end
+end
+
+function UI:SetLocked(locked)
+    if not frame then return end
+    frame:SetMovable(not locked)
+    frame:EnableMouse(not locked)
+    if locked then
+        frame:SetScript("OnDragStart", nil)
+        frame:SetScript("OnDragStop", nil)
+    else
+        frame:RegisterForDrag("LeftButton")
+        frame:SetScript("OnDragStart", frame.StartMoving)
+        frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+    end
+end
+
+function UI:FlashScreen()
+    if not NoDebuffNoLoot.db.profile.alerts.visual_flash then return end
+    
+    local f = _G["NDNL_FlashFrame"]
+    if not f then
+        f = CreateFrame("Frame", "NDNL_FlashFrame", UIParent)
+        f:SetFrameStrata("FULLSCREEN_DIALOG")
+        f:SetAllPoints(UIParent) -- Asegurar anclaje a UIParent explícitamente
+        -- Crear 4 texturas para formar un borde (menos invasivo)
+        local thickness = 50 
+        local alpha = 0.6
+        
+        local function CreateBorder(point1, point2, w, h)
+            local t = f:CreateTexture(nil, "BACKGROUND")
+            t:SetColorTexture(0, 1, 1, alpha)
+            t:SetBlendMode("ADD")
+            t:SetPoint(point1)
+            t:SetPoint(point2)
+            if w then t:SetWidth(w) end
+            if h then t:SetHeight(h) end
+            return t
+        end
+        
+        f.top = CreateBorder("TOPLEFT", "TOPRIGHT", nil, thickness)
+        f.bottom = CreateBorder("BOTTOMLEFT", "BOTTOMRIGHT", nil, thickness)
+        f.left = CreateBorder("TOPLEFT", "BOTTOMLEFT", thickness, nil)
+        f.right = CreateBorder("TOPRIGHT", "BOTTOMRIGHT", thickness, nil)
+        
+        f:SetAlpha(0)
+    end
+    
+    -- UIFrameFlash(frame, fadeInTime, fadeOutTime, flashDuration, showWhenFlashFinishes, flashInHoldTime, flashOutHoldTime)
+    UIFrameFlash(f, 0.5, 0.5, 2.0, false, 0, 0)
+    
+    if NoDebuffNoLoot.db.profile.alerts.sound then
+        PlaySound(8959) -- RAID_WARNING
+    end
 end
 
 function UI:Clear()

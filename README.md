@@ -14,7 +14,13 @@ The addon identifies which essential debuffs (such as *Sunder Armor* or *Faerie 
     *   **Yellow**: The debuff is about to expire (< 5s). Urgent renewal needed!
     *   **Red**: The debuff is not present on the boss.
 *   **Player Identification**: The HUD shows the assigned player's name next to each debuff.
-*   **Critical Alerts**: If you are responsible for a debuff and it is missing or about to expire, you will receive a visual alert in the center of your screen.
+*   **Critical Alerts**:
+    *   **Visual**: The screen borders will pulse **Cyan** if a critical debuff assigned to you is missing during combat.
+    *   **Audio**: A "Raid Warning" sound will play to ensure you don't miss it.
+    *   **Chat**: A text log is printed to the chat window for post-combat review.
+*   **Convenience**:
+    *   **Minimap Icon**: Quick access to options and HUD toggle.
+    *   **Lock HUD**: Prevent accidental movement of the frame.
 
 ## Chat Commands
 
@@ -63,7 +69,13 @@ El addon identifica qué debuffs esenciales (como *Hendedura de armadura* o *Fue
     *   **Amarillo**: El debuff está a punto de expirar (< 5s). ¡Renovación urgente!
     *   **Rojo**: El debuff no está presente en el jefe.
 *   **Identificación por Jugador**: El HUD muestra el nombre del jugador asignado junto a cada debuff.
-*   **Alertas Críticas**: Si eres el responsable de un debuff y este falta o va a caducar, recibirás un aviso visual en el centro de tu pantalla.
+*   **Alertas Críticas**:
+    *   **Visual**: Los bordes de la pantalla parpadearán en **Cian** si falta un debuff crítico asignado a ti durante el combate.
+    *   **Audio**: Sonará un aviso tipo "Raid Warning" para asegurarte de que no lo pases por alto.
+    *   **Chat**: Se imprimirá un registro de texto en el chat para revisión post-combate.
+*   **Comodidad**:
+    *   **Icono de Minimapa**: Acceso rápido a las opciones y al HUD.
+    *   **Bloqueo de HUD**: Opción para fijar el panel y evitar movimientos accidentales.
 
 ## Comandos de Chat
 
