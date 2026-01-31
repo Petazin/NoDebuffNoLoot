@@ -1,5 +1,9 @@
 # Changelog - NoDebuffNoLoot
 
+## [2.0.4] - 2026-01-31
+### Added
+- **Release Optimization**: Añadido archivo `.pkgmeta` para excluir automáticamente archivos de prueba, scripts de desarrollo y documentación interna de los paquetes de CurseForge.
+
 ## [2.0.3] - 2026-01-30
 ### Fixed
 - **CurseForge Integration**: Añadido Project ID para la subida automática.

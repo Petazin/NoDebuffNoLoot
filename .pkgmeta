@@ -1,0 +1,21 @@
+# Configuración de empaquetado para CurseForge
+# Este archivo controla qué archivos se incluyen en el release final.
+
+ignore:
+  # Eliminar carpetas de pruebas y scripts de las librerías
+  - Libs/**/tests
+  - Libs/**/*.bat
+  - Libs/**/*.sh
+  - Libs/**/check_globals.sh
+  
+  # Eliminar archivos internos de desarrollo y documentación de Gemini
+  - .git
+  - .github
+  - .gitignore
+  - .pkgmeta
+  - GEMINI.md
+  - ROADMAP.md
+  - task.md
+  - agent_activity.log
+  - CHANGELOG.md # Generalmente CurseForge genera su propio changelog desde los mensajes de commit o archivo aparte
+  - README.md # Opcional, pero para ahorrar espacio si solo quieres el código
