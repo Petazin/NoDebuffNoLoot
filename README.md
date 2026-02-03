@@ -8,19 +8,20 @@ Addon designed to optimize raid performance in World of Warcraft TBC by strictly
 
 The addon identifies which essential debuffs (such as *Sunder Armor* or *Faerie Fire*) are missing from your target. Unlike other generic trackers, **NoDebuffNoLoot** allows you to assign each debuff to a specific raid player, making the responsibility for maintaining the debuff clear and visible to everyone.
 
-### Information provided by the Addon:
-*   **Dynamic Visual HUD**: A floating panel that shows icons for tracked debuffs.
-    *   **Green**: The debuff is active and has enough time left (> 5s).
-    *   **Yellow**: The debuff is about to expire (< 5s). Urgent renewal needed!
-    *   **Red**: The debuff is not present on the boss.
-*   **Player Identification**: The HUD shows the assigned player's name next to each debuff.
-*   **Critical Alerts**:
-    *   **Visual**: The screen borders will pulse **Cyan** if a critical debuff assigned to you is missing during combat.
-    *   **Audio**: A "Raid Warning" sound will play to ensure you don't miss it.
-    *   **Chat**: A text log is printed to the chat window for post-combat review.
-*   **Convenience**:
-    *   **Minimap Icon**: Quick access to options and HUD toggle.
-    *   **Lock HUD**: Prevent accidental movement of the frame.
+## Information provided by the Addon
+
+* **Dynamic Visual HUD**: A floating panel that shows icons for tracked debuffs.
+  * **Green**: The debuff is active and has enough time left (> 5s).
+  * **Yellow**: The debuff is about to expire (< 5s). Urgent renewal needed!
+  * **Red**: The debuff is not present on the boss.
+* **Player Identification**: The HUD shows the assigned player's name next to each debuff.
+* **Critical Alerts**:
+  * **Visual**: The screen borders will pulse **Cyan** if a critical debuff assigned to you is missing during combat.
+  * **Audio**: A "Raid Warning" sound will play to ensure you don't miss it.
+  * **Chat**: A text log is printed to the chat window for post-combat review.
+* **Convenience**:
+  * **Minimap Icon**: Quick access to options and HUD toggle.
+  * **Lock HUD**: Prevent accidental movement of the frame.
 
 ## Chat Commands
 
@@ -32,9 +33,10 @@ The addon identifies which essential debuffs (such as *Sunder Armor* or *Faerie 
 ## Available Options
 
 From the configuration panel (`/ndnl`), you can:
-1.  **Enable/Disable HUD**: Hide the panel if you don't need it.
-2.  **Manage Assignments**: A complete list of supported debuffs where you can type the name of the responsible player (e.g., "Pepito" for *Sunder Armor*).
-3.  **Automatic Sync**: When changing an assignment while in a group, the addon will attempt to send changes automatically to others.
+
+1. **Enable/Disable HUD**: Hide the panel if you don't need it.
+2. **Manage Assignments**: A complete list of supported debuffs where you can type the name of the responsible player (e.g., "Pepito" for *Sunder Armor*).
+3. **Automatic Sync**: When changing an assignment while in a group, the addon will attempt to send changes automatically to others.
 
 ## Tracked Debuffs by Class
 
@@ -47,13 +49,16 @@ From the configuration panel (`/ndnl`), you can:
 | **Warlock** | Curse of Elements, Curse of Recklessness, Curse of Weakness |
 
 ## Installation
-1.  Download the repository.
-2.  Copy the `NoDebuffNoLoot` folder into your `Interface/AddOns/` directory.
-3.  Ensure the libraries in the `Libs` folder are present.
+
+1. Download the repository.
+2. Copy the `NoDebuffNoLoot` folder into your `Interface/AddOns/` directory.
+3. Ensure the libraries in the `Libs` folder are present.
 
 ---
 
-# NoDebuffNoLoot (TBC)
+---
+
+## NoDebuffNoLoot (Español)
 
 ![NoDebuffNoLoot Logo](logo.png)
 
@@ -63,19 +68,20 @@ Addon diseñado para optimizar el rendimiento de las raids en World of Warcraft 
 
 El addon identifica qué debuffs esenciales (como *Hendedura de armadura* o *Fuego de hadas*) faltan en tu objetivo. A diferencia de otros rastreadores genéricos, **NoDebuffNoLoot** permite asignar cada debuff a un jugador específico de la raid, haciendo que la responsabilidad de mantener el debuff sea clara y visible para todos.
 
-### Información proporcionada por el Addon:
-*   **HUD Visual Dinámico**: Un panel flotante que muestra los iconos de los debuffs rastreados.
-    *   **Verde**: El debuff está activo y tiene tiempo suficiente (> 5s).
-    *   **Amarillo**: El debuff está a punto de expirar (< 5s). ¡Renovación urgente!
-    *   **Rojo**: El debuff no está presente en el jefe.
-*   **Identificación por Jugador**: El HUD muestra el nombre del jugador asignado junto a cada debuff.
-*   **Alertas Críticas**:
-    *   **Visual**: Los bordes de la pantalla parpadearán en **Cian** si falta un debuff crítico asignado a ti durante el combate.
-    *   **Audio**: Sonará un aviso tipo "Raid Warning" para asegurarte de que no lo pases por alto.
-    *   **Chat**: Se imprimirá un registro de texto en el chat para revisión post-combate.
-*   **Comodidad**:
-    *   **Icono de Minimapa**: Acceso rápido a las opciones y al HUD.
-    *   **Bloqueo de HUD**: Opción para fijar el panel y evitar movimientos accidentales.
+## Información proporcionada por el Addon
+
+* **HUD Visual Dinámico**: Un panel flotante que muestra los iconos de los debuffs rastreados.
+  * **Verde**: El debuff está activo y tiene tiempo suficiente (> 5s).
+  * **Amarillo**: El debuff está a punto de expirar (< 5s). ¡Renovación urgente!
+  * **Rojo**: El debuff no está presente en el jefe.
+* **Identificación por Jugador**: El HUD muestra el nombre del jugador asignado junto a cada debuff.
+* **Alertas Críticas**:
+  * **Visual**: Los bordes de la pantalla parpadearán en **Cian** si falta un debuff crítico asignado a ti durante el combate.
+  * **Audio**: Sonará un aviso tipo "Raid Warning" para asegurarte de que no lo pases por alto.
+  * **Chat**: Se imprimirá un registro de texto en el chat para revisión post-combate.
+* **Comodidad**:
+  * **Icono de Minimapa**: Acceso rápido a las opciones y al HUD.
+  * **Bloqueo de HUD**: Opción para fijar el panel y evitar movimientos accidentales.
 
 ## Comandos de Chat
 
@@ -87,9 +93,10 @@ El addon identifica qué debuffs esenciales (como *Hendedura de armadura* o *Fue
 ## Opciones Disponibles
 
 Desde el panel de configuración (`/ndnl`), puedes:
-1.  **Habilitar/Deshabilitar el HUD**: Oculta el panel si no lo necesitas.
-2.  **Gestionar Asignaciones**: Un listado completo de los debuffs soportados donde puedes escribir el nombre del jugador responsable (ej. "Pepito" para *Sunder Armor*).
-3.  **Sincronización Automática**: Al cambiar una asignación estando en grupo, el addon intentará enviar los cambios automáticamente a los demás.
+
+1. **Habilitar/Deshabilitar el HUD**: Oculta el panel si no lo necesitas.
+2. **Gestionar Asignaciones**: Un listado completo de los debuffs soportados donde puedes escribir el nombre del jugador responsable (ej. "Pepito" para *Sunder Armor*).
+3. **Sincronización Automática**: Al cambiar una asignación estando en grupo, el addon intentará enviar los cambios automáticamente a los demás.
 
 ## Debuffs Rastreados por Clase
 
@@ -102,6 +109,7 @@ Desde el panel de configuración (`/ndnl`), puedes:
 | **Warlock** | Curse of Elements, Curse of Recklessness, Curse of Weakness |
 
 ## Instalación
-1.  Descarga el repositorio.
-2.  Copia la carpeta `NoDebuffNoLoot` en tu directorio `Interface/AddOns/`.
-3.  Asegúrate de que las librerías en la carpeta `Libs` estén presentes.
+
+1. Descarga el repositorio.
+2. Copia la carpeta `NoDebuffNoLoot` en tu directorio `Interface/AddOns/`.
+3. Asegúrate de que las librerías en la carpeta `Libs` estén presentes.

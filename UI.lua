@@ -130,13 +130,38 @@ function UI:SetStatus(debuffName, status, timeLeft, assignedPlayer, iconPath)
     
     row.text:SetText(string.format("%s%s (%s)|r - %s", color, debuffName, assignedPlayer, statusText))
     
-    -- Ajustar posiciones de filas
+    self:UpdateLayout()
+end
+
+function UI:HideRow(debuffName)
+    if not frame or not frame.rows[debuffName] then return end
+    frame.rows[debuffName]:Hide()
+    self:UpdateLayout()
+end
+
+function UI:UpdateLayout()
+    if not frame then return end
     local i = 0
-    for _, r in pairs(frame.rows) do
+    -- Note: pairs order is random. For stable ordering, we might need a sorted list.
+    -- For now, relying on luck or existing iteration stability.
+    -- Ideally: Sort by name or priority.
+    local sortedNames = {}
+    for name, _ in pairs(frame.rows) do
+        table.insert(sortedNames, name)
+    end
+    table.sort(sortedNames)
+
+    for _, name in ipairs(sortedNames) do
+        local r = frame.rows[name]
         if r:IsShown() then
             r:SetPoint("TOP", frame, "TOP", 0, -i * 20)
             i = i + 1
         end
     end
-    frame:SetHeight(math.max(20, i * 20))
+    
+    if i == 0 then
+        frame:Hide()
+    else
+        frame:SetHeight(math.max(20, i * 20))
+    end
 end

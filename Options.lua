@@ -39,6 +39,18 @@ local options = {
                     end,
                     order = 3,
                 },
+                filterMine = {
+                    type = "toggle",
+                    name = L["OPT_FILTER_MINE"],
+                    desc = L["OPT_FILTER_MINE_DESC"],
+                    get = function() return NoDebuffNoLoot.db.profile.hud.filterMine end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.filterMine = val
+                        NoDebuffNoLoot:UpdateTracker()
+                    end,
+                    order = 4,
+                    width = "full",
+                },
                 alertsHeader = {
                     type = "header",
                     name = "Alerts & Notifications",

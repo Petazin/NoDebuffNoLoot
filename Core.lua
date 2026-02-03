@@ -32,7 +32,10 @@ local defaults = {
             locked = false,
             scale = 1.0,
             x = 0,
+            scale = 1.0,
+            x = 0,
             y = 0,
+            filterMine = false,
         },
         alerts = {
             chat = true,
@@ -141,7 +144,9 @@ function NoDebuffNoLoot:UpdateTracker()
         local assignedPlayer = self.db.profile.assignments[debuffName]
         
         if assignedPlayer then
-            alertStates[debuffName] = alertStates[debuffName] or { missing = false, expire = false }
+            -- Filter: Show Only Mine
+            if not self.db.profile.hud.filterMine or assignedPlayer == playerName then
+                alertStates[debuffName] = alertStates[debuffName] or { missing = false, expire = false }
             
             local activeData = activeDebuffs[debuffName]
             
@@ -186,6 +191,11 @@ function NoDebuffNoLoot:UpdateTracker()
                 end
                 alertStates[debuffName].expire = false
             end
+
+            else
+                if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffName) end
+            end
         end
     end
 end
+
