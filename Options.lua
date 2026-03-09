@@ -28,10 +28,21 @@ local options = {
                     end,
                     order = 2,
                 },
+                alwaysShow = {
+                    type = "toggle",
+                    name = L["OPT_ALWAYS_SHOW"],
+                    desc = L["OPT_ALWAYS_SHOW_DESC"],
+                    get = function() return NoDebuffNoLoot.db.profile.hud.alwaysShow end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.alwaysShow = val
+                        NoDebuffNoLoot:UpdateTracker()
+                    end,
+                    order = 2.5,
+                },
                 lockHud = {
                     type = "toggle",
-                    name = "Lock HUD",
-                    desc = "Lock the HUD frame to prevent moving",
+                    name = L["OPT_LOCK"],
+                    desc = L["OPT_LOCK_DESC"],
                     get = function() return NoDebuffNoLoot.db.profile.hud.locked end,
                     set = function(_, val)
                         NoDebuffNoLoot.db.profile.hud.locked = val
@@ -51,44 +62,68 @@ local options = {
                     order = 4,
                     width = "full",
                 },
+                onlyMissing = {
+                    type = "toggle",
+                    name = L["OPT_ONLY_MISSING"],
+                    desc = L["OPT_ONLY_MISSING_DESC"],
+                    get = function() return NoDebuffNoLoot.db.profile.hud.onlyMissing end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.onlyMissing = val
+                        NoDebuffNoLoot:UpdateTracker()
+                    end,
+                    order = 4.5,
+                    width = "full",
+                },
+                bossOnly = {
+                    type = "toggle",
+                    name = L["OPT_BOSS_ONLY"],
+                    desc = L["OPT_BOSS_ONLY_DESC"],
+                    get = function() return NoDebuffNoLoot.db.profile.hud.bossOnly end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.bossOnly = val
+                        NoDebuffNoLoot:UpdateTracker()
+                    end,
+                    order = 5,
+                    width = "full",
+                },
                 alertsHeader = {
                     type = "header",
-                    name = "Alerts & Notifications",
+                    name = L["OPT_ALERTS_HEADER"],
                     order = 10,
                 },
                 alertChat = {
                     type = "toggle",
-                    name = "Chat Alerts",
-                    desc = "Print alerts to chat window",
+                    name = L["OPT_CHAT"],
+                    desc = L["OPT_CHAT_DESC"],
                     get = function() return NoDebuffNoLoot.db.profile.alerts.chat end,
                     set = function(_, val) NoDebuffNoLoot.db.profile.alerts.chat = val end,
                     order = 11,
                 },
                 alertSound = {
                     type = "toggle",
-                    name = "Sound Alerts",
-                    desc = "Play sounds on alert",
+                    name = L["OPT_SOUND"],
+                    desc = L["OPT_SOUND_DESC"],
                     get = function() return NoDebuffNoLoot.db.profile.alerts.sound end,
                     set = function(_, val) NoDebuffNoLoot.db.profile.alerts.sound = val end,
                     order = 12,
                 },
                 alertFlash = {
                     type = "toggle",
-                    name = "Screen Flash",
-                    desc = "Flash screen borders on critical missing debuffs",
+                    name = L["OPT_FLASH"],
+                    desc = L["OPT_FLASH_DESC"],
                     get = function() return NoDebuffNoLoot.db.profile.alerts.visual_flash end,
                     set = function(_, val) NoDebuffNoLoot.db.profile.alerts.visual_flash = val end,
                     order = 13,
                 },
                 minimapHeader = {
                     type = "header",
-                    name = "Minimap Icon",
+                    name = L["OPT_MINIMAP_HEADER"],
                     order = 20,
                 },
                 minimapIcon = {
                     type = "toggle",
-                    name = "Show Minimap Icon",
-                    desc = "Toggle the minimap button (requires Reload)",
+                    name = L["OPT_MINIMAP"],
+                    desc = L["OPT_MINIMAP_DESC"],
                     get = function() return not NoDebuffNoLoot.db.profile.minimap.hide end,
                     set = function(_, val) 
                         NoDebuffNoLoot.db.profile.minimap.hide = not val
@@ -104,34 +139,33 @@ local options = {
             type = 'group',
             name = L["ASSIGNMENTS"],
             order = 2,
-            args = {},
+            args = {
+                desc = {
+                    type = "description",
+                    name = L["ASSIGNMENTS_MOVED"],
+                    order = 1,
+                },
+                openRealConfig = {
+                    type = "execute",
+                    name = L["OPT_OPEN_ASSIGNMENTS"],
+                    desc = L["OPT_OPEN_ASSIGNMENTS_DESC"],
+                    func = function()
+                        -- Cierra la ventana actual de opciones de Blizzard
+                        HideUIPanel(InterfaceOptionsFrame)
+                        -- Abre la nueva interfaz custom
+                        if ns.ConfigUI and ns.ConfigUI.Show then
+                            ns.ConfigUI:Show()
+                        end
+                    end,
+                    order = 2,
+                    width = "full",
+                }
+            },
         },
     },
 }
 
 function NoDebuffNoLoot:SetupOptions()
-    for name, info in pairs(ns.Data.Debuffs) do
-        local localizedName, _, icon = GetSpellInfo(info.id)
-        local displayName = localizedName or name
-        
-        options.args.assignments.args[name:gsub("[%s']+", "")] = {
-            type = 'input',
-            name = "|T" .. (icon or "") .. ":16|t " .. displayName,
-            desc = L["PLAYER_NAME_DESC"],
-            get = function() return self.db.profile.assignments[name] or "" end,
-            set = function(_, val) 
-                if val == "" then val = nil end
-                self.db.profile.assignments[name] = val
-                self:UpdateTracker()
-                -- Auto-sync on change
-                if ns.Assignments and ns.Assignments.PushConfiguration then
-                    ns.Assignments:PushConfiguration()
-                end
-            end,
-            order = 10,
-        }
-    end
-
     LibStub("AceConfig-3.0"):RegisterOptionsTable("NoDebuffNoLoot", options)
     self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("NoDebuffNoLoot", "NoDebuffNoLoot")
 end

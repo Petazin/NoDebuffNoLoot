@@ -7,16 +7,27 @@ local AceSerializer = LibStub("AceSerializer-3.0")
 
 local COMM_PREFIX = "NDNL_SYNC"
 
-function Assignments:Set(debuffName, playerName)
-    NoDebuffNoLoot.db.profile.assignments[debuffName] = playerName
-    NoDebuffNoLoot:Print(string.format("Asignado %s a %s", debuffName, playerName))
+function Assignments:Set(debuffId, primaryPlayer, backupPlayer)
+    -- This function is kept for backwards compatibility or programmatic use
+    table.insert(NoDebuffNoLoot.db.profile.assignments, {
+        spellId = debuffId,
+        primary = primaryPlayer,
+        backup = backupPlayer
+    })
+    
+    NoDebuffNoLoot:Print(string.format("Asignado %s a %s (Backup: %s)", GetSpellInfo(debuffId) or debuffId, primaryPlayer, backupPlayer or "N/A"))
     if IsInRaid() or IsInGroup() then
         self:PushConfiguration()
     end
 end
 
-function Assignments:Clear(debuffName)
-    NoDebuffNoLoot.db.profile.assignments[debuffName] = nil
+function Assignments:Clear(debuffId)
+    local list = NoDebuffNoLoot.db.profile.assignments
+    for i = #list, 1, -1 do
+        if list[i].spellId == debuffId then
+            table.remove(list, i)
+        end
+    end
 end
 
 function Assignments:PushConfiguration()

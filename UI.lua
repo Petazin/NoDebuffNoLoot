@@ -93,11 +93,11 @@ function UI:Clear()
     frame:Hide()
 end
 
-function UI:SetStatus(debuffName, status, timeLeft, assignedPlayer, iconPath)
+function UI:SetStatus(debuffId, debuffName, status, timeLeft, assignedPlayer, backupPlayer, iconPath)
     if not frame then self:Init() end
     frame:Show()
     
-    local row = frame.rows[debuffName]
+    local row = frame.rows[debuffId]
     if not row then
         row = CreateFrame("Frame", nil, frame)
         row:SetSize(200, 20)
@@ -110,25 +110,57 @@ function UI:SetStatus(debuffName, status, timeLeft, assignedPlayer, iconPath)
         local text = row:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         text:SetPoint("LEFT", icon, "RIGHT", 5, 0)
         row.text = text
+
+        -- Textura de brillo/alerta (Glow)
+        local glow = row:CreateTexture(nil, "OVERLAY")
+        glow:SetColorTexture(1, 0.2, 0, 0.4) -- Naranja/Rojo transparente
+        glow:SetBlendMode("ADD")
+        glow:SetAllPoints(row)
+        glow:Hide()
+        row.glow = glow
         
-        frame.rows[debuffName] = row
+        frame.rows[debuffId] = row
     end
     
     row:Show()
     row.icon:SetTexture(iconPath)
     
+    local color, statusText
     if status == "MISSING" then
         color = "|cFFFF0000" -- Rojo
-        statusText = L["STATUS_MISSING"]
-    elseif timeLeft < 5 then
-        color = "|cFFFFFF00" -- Amarillo
-        statusText = string.format("%s: %.1fs", L["STATUS_ACTIVE"], timeLeft)
+        statusText = L["STATUS_MISSING"] or "Missing"
+        if not row.glow:IsShown() then
+            row.glow:Show()
+            UIFrameFlash(row.glow, 0.5, 0.5, -1, true, 0, 0)
+        end
+    elseif status == "PENDING" then
+        color = "|cFFFFFF00" -- Amarillo/Naranja
+        statusText = L["STATUS_MISSING"] or "Missing"
+        row.glow:Hide()
+        UIFrameFlashStop(row.glow)
+    elseif status == "IDLE" then
+        color = "|cFF888888" -- Gris
+        statusText = L["STATUS_IDLE"] or "Waiting Target..."
+        row.glow:Hide()
+        UIFrameFlashStop(row.glow)
     else
-        color = "|cFF00FF00" -- Verde
-        statusText = string.format("%s: %.1fs", L["STATUS_ACTIVE"], timeLeft)
+        row.glow:Hide()
+        UIFrameFlashStop(row.glow)
+        if timeLeft < 5 then
+            color = "|cFFFFFF00" -- Amarillo
+            statusText = string.format("%s: %.1fs", L["STATUS_ACTIVE"], timeLeft)
+        else
+            color = "|cFF00FF00" -- Verde
+            statusText = string.format("%s: %.1fs", L["STATUS_ACTIVE"], timeLeft)
+        end
     end
     
-    row.text:SetText(string.format("%s%s (%s)|r - %s", color, debuffName, assignedPlayer, statusText))
+    local backupStr = ""
+    if backupPlayer and backupPlayer ~= "" then
+        backupStr = " | |cFF888888[B:" .. backupPlayer .. "]|r"
+    end
+    
+    row.text:SetText(string.format("%s%s (%s)%s|r - %s", color, debuffName, assignedPlayer, backupStr, statusText))
     
     self:UpdateLayout()
 end
@@ -141,21 +173,17 @@ end
 
 function UI:UpdateLayout()
     if not frame then return end
+    
     local i = 0
-    -- Note: pairs order is random. For stable ordering, we might need a sorted list.
-    -- For now, relying on luck or existing iteration stability.
-    -- Ideally: Sort by name or priority.
-    local sortedNames = {}
-    for name, _ in pairs(frame.rows) do
-        table.insert(sortedNames, name)
-    end
-    table.sort(sortedNames)
-
-    for _, name in ipairs(sortedNames) do
-        local r = frame.rows[name]
-        if r:IsShown() then
-            r:SetPoint("TOP", frame, "TOP", 0, -i * 20)
-            i = i + 1
+    -- Iterar respetando estrictamente el orden de las asignaciones en la BD
+    for _, assignment in ipairs(NoDebuffNoLoot.db.profile.assignments) do
+        local debuffId = assignment.spellId
+        if debuffId and frame.rows[debuffId] then
+            local r = frame.rows[debuffId]
+            if r:IsShown() then
+                r:SetPoint("TOP", frame, "TOP", 0, -i * 20)
+                i = i + 1
+            end
         end
     end
     

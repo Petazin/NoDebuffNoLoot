@@ -14,6 +14,10 @@ local ndnlLDB = LDB:NewDataObject("NoDebuffNoLoot", {
     OnClick = function(self, button)
         if button == "RightButton" then
             NoDebuffNoLoot:OpenOptions()
+        elseif button == "LeftButton" and IsShiftKeyDown() then
+            if ns.ConfigUI and ns.ConfigUI.Show then
+                ns.ConfigUI:Show()
+            end
         else
             if NoDebuffNoLoot.db.profile.hud.shown then
                 NoDebuffNoLoot.db.profile.hud.shown = false
@@ -29,8 +33,9 @@ local ndnlLDB = LDB:NewDataObject("NoDebuffNoLoot", {
         tooltip:AddLine(" ")
         tooltip:AddLine(L["SHOW_HUD_DESC"], 1, 1, 1)
         tooltip:AddDoubleLine("Status:", NoDebuffNoLoot.db.profile.hud.shown and "|cFF00FF00Show|r" or "|cFFFF0000Hide|r")
-        tooltip:AddLine("|cFFEDA55FClick|r to Toggle HUD")
-        tooltip:AddLine("|cFFEDA55FRight-Click|r for Options")
+        tooltip:AddLine(L["LDB_CLICK_TOGGLE"])
+        tooltip:AddLine(L["LDB_SHIFT_CLICK_ASSIGNMENTS"])
+        tooltip:AddLine(L["LDB_RIGHT_CLICK_OPTIONS"])
     end,
 })
 

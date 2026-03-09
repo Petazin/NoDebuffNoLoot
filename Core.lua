@@ -8,6 +8,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("NoDebuffNoLoot")
 function NoDebuffNoLoot:OnEnable()
     self:RegisterEvent("UNIT_AURA")
     self:RegisterEvent("PLAYER_TARGET_CHANGED")
+    self:RegisterEvent("PLAYER_REGEN_DISABLED")
     
     -- Usar C_Timer nativo por robustez. Tick cada 0.5s para no sobrecargar
     if self.timer then self.timer:Cancel() end
@@ -26,21 +27,25 @@ end
 
 local defaults = {
     profile = {
-        assignments = {},
+        assignments = {
+            -- Lista ordenada por defecto. Fallback. [1] = { debuff = "Sunder Armor", primary = "", backup = "" }
+        },
         hud = {
             shown = true,
+            alwaysShow = false,
             locked = false,
-            scale = 1.0,
-            x = 0,
             scale = 1.0,
             x = 0,
             y = 0,
             filterMine = false,
+            onlyMissing = false,
+            bossOnly = false,
         },
         alerts = {
             chat = true,
             sound = true,
             visual_flash = true,
+            combatDelay = 3, -- Segundos de gracia
         },
         minimap = {
             hide = false,
@@ -53,6 +58,7 @@ local alertStates = {}
 
 -- Caché de nombres localizados: Localizado -> Ingles
 local localizedToEnglish = {}
+local combatStartTime = 0
 
 function NoDebuffNoLoot:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("NoDebuffNoLootDB", defaults, true)
@@ -107,93 +113,138 @@ function NoDebuffNoLoot:PLAYER_TARGET_CHANGED()
     self:UpdateTracker()
 end
 
-function NoDebuffNoLoot:UpdateTracker()
-    if not UnitExists("target") or UnitIsFriend("player", "target") or UnitIsDead("target") then
-        if ns.UI and ns.UI.Clear then ns.UI:Clear() end
-        return
-    end
+function NoDebuffNoLoot:PLAYER_REGEN_DISABLED()
+    combatStartTime = GetTime()
+end
 
+function NoDebuffNoLoot:UpdateTracker()
     if not self.db.profile.hud.shown then 
         if ns.UI and ns.UI.Clear then ns.UI:Clear() end
         return 
     end
 
-    local playerName = UnitName("player")
-    
-    -- 1. Escanear todos los debuffs del objetivo una sola vez
-    local activeDebuffs = {}
-    for i = 1, 40 do
-        local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura("target", i, "HARMFUL")
-        if not name then break end
-        
-        -- Si este debuff localizado está en nuestra base de datos, lo guardamos
-        local englishKey = localizedToEnglish[name]
-        if englishKey then
-            activeDebuffs[englishKey] = {
-                name = name,
-                icon = icon,
-                duration = duration,
-                expirationTime = expirationTime,
-                spellId = spellId
-            }
+    local validTarget = UnitExists("target") and not UnitIsFriend("player", "target") and not UnitIsDead("target")
+
+    -- Filter by Boss
+    if validTarget and self.db.profile.hud.bossOnly then
+        local classification = UnitClassification("target")
+        local isBoss = (classification == "worldboss" or UnitLevel("target") == -1)
+        if not isBoss then
+            validTarget = false
         end
     end
 
-    -- 2. Actualizar el HUD basado en las asignaciones
-    for debuffName, info in pairs(ns.Data.Debuffs) do
-        local assignedPlayer = self.db.profile.assignments[debuffName]
-        
-        if assignedPlayer then
-            -- Filter: Show Only Mine
-            if not self.db.profile.hud.filterMine or assignedPlayer == playerName then
-                alertStates[debuffName] = alertStates[debuffName] or { missing = false, expire = false }
-            
-            local activeData = activeDebuffs[debuffName]
-            
-            if activeData then
-                local timeLeft = activeData.expirationTime > 0 and (activeData.expirationTime - GetTime()) or 999
-                
-                -- DEBUG VERBOSO eliminado por limpieza
-                ns.UI:SetStatus(debuffName, "ACTIVE", timeLeft, assignedPlayer, activeData.icon or info.icon)
-                
-                -- Alerta de expiración
-                if assignedPlayer == playerName and timeLeft < 5 then
-                    if not alertStates[debuffName].expire then
-                        UIErrorsFrame:AddMessage(string.format(L["ALERT_EXPIRE"], debuffName), 1.0, 1.0, 0.0)
-                        alertStates[debuffName].expire = true
-                    end
-                elseif timeLeft >= 5 then
-                    alertStates[debuffName].expire = false
-                end
-                alertStates[debuffName].missing = false
-            else
-                ns.UI:SetStatus(debuffName, "MISSING", 0, assignedPlayer, info.icon)
-                
-                -- Alerta de missing (Solo si estamos en combate)
-                if assignedPlayer == playerName then
-                    -- Resetear estado si no estamos en combate para permitir re-alerta al iniciar
-                    if not InCombatLockdown() then
-                        alertStates[debuffName].missing = false
-                    elseif not alertStates[debuffName].missing then
-                         UIErrorsFrame:AddMessage(string.format(L["ALERT_MISSING"], debuffName), 1.0, 0.0, 0.0)
-                        
-                        -- Chat Log Alert
-                        if self.db.profile.alerts.chat then
-                            self:Print(string.format(L["ALERT_MISSING"], debuffName))
-                        end
+    if not validTarget and not self.db.profile.hud.alwaysShow then
+        if ns.UI and ns.UI.Clear then ns.UI:Clear() end
+        return
+    end
 
-                        if ns.UI and ns.UI.FlashScreen then
-                             ns.UI:FlashScreen()
-                        end
-                        
-                        alertStates[debuffName].missing = true
-                    end
+    local playerName = UnitName("player")
+    
+    -- 1. Escanear todos los debuffs del objetivo solo si hay target
+    local activeDebuffs = {}
+    if validTarget then
+        for i = 1, 40 do
+            local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura("target", i, "HARMFUL")
+            if not name then break end
+            
+            -- Si este debuff localizado está en nuestra base de datos, lo guardamos
+            local englishKey = localizedToEnglish[name]
+            if englishKey then
+                activeDebuffs[englishKey] = {
+                    name = name,
+                    icon = icon,
+                    duration = duration,
+                    expirationTime = expirationTime,
+                    spellId = spellId
+                }
+            end
+        end
+    end
+
+    -- 2. Actualizar el HUD basado en la nueva lista ordenada de asignaciones
+    for _, assignment in ipairs(self.db.profile.assignments) do
+        local debuffId = assignment.spellId
+        local assignedPlayer = assignment.primary
+        local backupPlayer = assignment.backup
+        
+        -- Asegurar que debuffId exista
+        if debuffId then
+            local debuffName = GetSpellInfo(debuffId)
+            local icon = GetSpellTexture(debuffId)
+            
+            -- Para buscar en activeDebuffs, necesitamos el nombre en inglés o usar la caché
+            -- La nueva lógica puede simplemente comparar el spellId directamente con activeDebuffs
+            -- Vamos a simplificar: buscamos si activeDebuffs tiene este spellId
+            local activeData = nil
+            for _, ad in pairs(activeDebuffs) do
+                if ad.spellId == debuffId or ad.name == debuffName then
+                    activeData = ad
+                    break
                 end
-                alertStates[debuffName].expire = false
             end
 
+            -- Si no validamos playerName, se muestra todo (según filtro)
+            if not self.db.profile.hud.filterMine or assignedPlayer == playerName or backupPlayer == playerName then
+                
+                -- Inicializar el estado de alertas de este debuff si no existe (usamos el ID como key ahora)
+                alertStates[debuffId] = alertStates[debuffId] or { missing = false, expire = false }
+            
+                if not validTarget then
+                    -- Mostrar HUD inactivo (IDLE) si no hay target pero está el override "alwaysShow"
+                    ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon)
+                    alertStates[debuffId].missing = false
+                    alertStates[debuffId].expire = false
+                elseif activeData then
+                    local timeLeft = activeData.expirationTime > 0 and (activeData.expirationTime - GetTime()) or 999
+                    
+                    if self.db.profile.hud.onlyMissing then
+                        if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
+                    else
+                        ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon)
+                    end
+                    
+                    -- Alerta de expiración
+                    if (assignedPlayer == playerName or backupPlayer == playerName) and timeLeft < 5 then
+                        if not alertStates[debuffId].expire then
+                            UIErrorsFrame:AddMessage(string.format(L["ALERT_EXPIRE"], debuffName), 1.0, 1.0, 0.0)
+                            alertStates[debuffId].expire = true
+                        end
+                    elseif timeLeft >= 5 then
+                        alertStates[debuffId].expire = false
+                    end
+                    alertStates[debuffId].missing = false
+                else
+                    local inCombat = InCombatLockdown()
+                    local delay = tonumber(assignment.combatDelay) or 3
+                    local inGracePeriod = inCombat and (GetTime() - combatStartTime < delay)
+
+                    if not inCombat or inGracePeriod then
+                        ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon)
+                        alertStates[debuffId].missing = false
+                    else
+                        ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon)
+                        
+                        -- Alerta de missing dura (solo a los encargados)
+                        if (assignedPlayer == playerName or backupPlayer == playerName) and not alertStates[debuffId].missing then
+                            UIErrorsFrame:AddMessage(string.format(L["ALERT_MISSING"], debuffName), 1.0, 0.0, 0.0)
+                            
+                            -- Chat Log Alert
+                            if self.db.profile.alerts.chat then
+                                self:Print(string.format(L["ALERT_MISSING"], debuffName))
+                            end
+
+                            if ns.UI and ns.UI.FlashScreen then
+                                 ns.UI:FlashScreen()
+                            end
+                            
+                            alertStates[debuffId].missing = true
+                        end
+                    end
+                    alertStates[debuffId].expire = false
+                end
             else
-                if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffName) end
+                if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
             end
         end
     end

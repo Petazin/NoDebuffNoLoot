@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.2.0] - 2026-03-09
+
+### Added - v2.2.0
+
+- **Custom ConfigUI**: Completely brand new, dynamic assignment panel with 3 configurable columns (Spell, Primary, Backup) and priority re-ordering via Drag-and-Drop/Up-Down buttons.
+- **Raid Announcements**: New "Announce to Raid" button added to the assignments panel. It sends a `RAID_WARNING` with the full list and simultaneously sends private `WHISPER`s to assigned players (requires Raid Leader/Assistant privileges to prevent spam).
+- **Advanced HUD States**: HUD now has 3 clear visual states:
+  - **IDLE** (Gray): Waiting for a valid target.
+  - **PENDING** (Yellow): Target acquired but waiting for the combat grace period to expire.
+  - **MISSING/ACTIVE** (Red Glow / Green): Active tracking during combat.
+- **Per-Debuff Grace Period**: Replaced global combat delay with a customizable `Delay` column per assignment, allowing specific grace seconds before triggering missing alerts.
+- **Advanced Filters**: Added "Show Only Missing" and "Only on Bosses" (Skull Level) options to reduce HUD clutter.
+- **Full Localization**: The entire UI is now fully localized and translates automatically to English (`enUS`) or Spanish (`esES`) based on the game client.
+- **Minimap Integration**: Added `Shift-Click` on the minimap icon to open the Assignments panel instantly.
+
+### Changed - v2.2.0
+
+- **Data Structure**: Breaking change. Assignments are now saved as an ordered array `[1] = {spellId, primary, backup}` to support priority levels, wiping the old dictionary configuration.
+- Removed all dependencies and visual references to Method Raid Tools (MRT).
+
+---
+
 ## [2.1.1] - 2026-02-02
 
 ### Added - v2.1.1
