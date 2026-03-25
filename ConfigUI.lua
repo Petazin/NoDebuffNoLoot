@@ -21,8 +21,8 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
     
     -- Col 1: Spell ID/Name
     local spellEdit = CreateFrame("EditBox", nil, row, "InputBoxTemplate")
-    spellEdit:SetSize(120, 20)
-    spellEdit:SetPoint("LEFT", 5, 0)
+    spellEdit:SetSize(140, 20)
+    spellEdit:SetPoint("LEFT", 30, 0)
     spellEdit:SetAutoFocus(false)
     
     -- Icon preview
@@ -32,14 +32,14 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
     
     -- Col 2: Primary
     local primaryEdit = CreateFrame("EditBox", nil, row, "InputBoxTemplate")
-    primaryEdit:SetSize(100, 20)
+    primaryEdit:SetSize(110, 20)
     primaryEdit:SetPoint("LEFT", iconTx, "RIGHT", 15, 0)
     primaryEdit:SetAutoFocus(false)
     
     -- Col 3: Backup
     local backupEdit = CreateFrame("EditBox", nil, row, "InputBoxTemplate")
-    backupEdit:SetSize(100, 20)
-    backupEdit:SetPoint("LEFT", primaryEdit, "RIGHT", 10, 0)
+    backupEdit:SetSize(110, 20)
+    backupEdit:SetPoint("LEFT", primaryEdit, "RIGHT", 15, 0)
     backupEdit:SetAutoFocus(false)
     
     -- Col 4: Delay
@@ -53,7 +53,7 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
     -- Priority Buttons
     local upBtn = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
     upBtn:SetSize(24, 24)
-    upBtn:SetPoint("LEFT", delayEdit, "RIGHT", 20, 0)
+    upBtn:SetPoint("LEFT", delayEdit, "RIGHT", 25, 0)
     upBtn:SetText("^")
     
     local downBtn = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
@@ -66,6 +66,19 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
     delBtn:SetSize(24, 24)
     delBtn:SetPoint("LEFT", downBtn, "RIGHT", 10, 0)
     delBtn:SetText("X")
+
+    -- Smart Suggester Button
+    local suggestBtn = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+    suggestBtn:SetSize(24, 24)
+    suggestBtn:SetPoint("RIGHT", spellEdit, "LEFT", -4, 0)
+    suggestBtn:SetText("+")
+
+    -- Error Indicator
+    local errorIcon = row:CreateTexture(nil, "OVERLAY")
+    errorIcon:SetSize(16, 16)
+    errorIcon:SetPoint("LEFT", delBtn, "RIGHT", 5, 0)
+    errorIcon:SetTexture("Interface\\DialogFrame\\UI-Dialog-Icon-AlertNew")
+    errorIcon:Hide()
     
     -- Auto-save logic
     local function SaveData()
@@ -85,6 +98,17 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
             row.data.combatDelay = delayVal and delayVal or 3
             
             iconTx:SetTexture(GetSpellTexture(sId))
+            
+            -- Validate
+            local ok, errCode = ns.SmartSelection:Validate(row.data.primary, sId)
+            if not ok then
+                errorIcon:Show()
+                row.error = L["ERR_" .. errCode] or errCode
+            else
+                errorIcon:Hide()
+                row.error = nil
+            end
+
             NoDebuffNoLoot:UpdateTracker()
             if ns.Assignments and ns.Assignments.PushConfiguration then
                 ns.Assignments:PushConfiguration()
@@ -97,9 +121,53 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
                 row.data.backup = backupEdit:GetText()
                 row.data.combatDelay = tonumber(delayEdit:GetText()) or 3
                 iconTx:SetTexture(nil)
+                errorIcon:Hide()
             end
         end
     end
+
+    errorIcon:SetScript("OnEnter", function(self)
+        if row.error then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(row.error, 1, 0, 0)
+            GameTooltip:Show()
+        end
+    end)
+    errorIcon:SetScript("OnLeave", function() GameTooltip:Hide() end)
+
+    local function OpenMenu(menu, parent)
+        local menuFrame = CreateFrame("Frame", "NDNL_DropDownMenu", parent, "UIDropDownMenuTemplate")
+        local function InitializeMenu(self, level)
+            for _, item in ipairs(menu) do
+                UIDropDownMenu_AddButton(item, level)
+            end
+        end
+        UIDropDownMenu_Initialize(menuFrame, InitializeMenu, "MENU")
+        ToggleDropDownMenu(1, nil, menuFrame, "cursor", 0, 0)
+    end
+
+    suggestBtn:SetScript("OnClick", function()
+        local available = ns.SmartSelection:GetAvailableDebuffs()
+        if #available == 0 then return end
+
+        local menu = {
+            { text = L["SUGGESTED_DEBUFFS"], isTitle = true, notCheckable = true }
+        }
+        for _, debuff in ipairs(available) do
+            table.insert(menu, {
+                text = debuff.name,
+                func = function()
+                    spellEdit:SetText(debuff.name)
+                    SaveData()
+                    ns.ConfigUI:Refresh()
+                end,
+                notCheckable = true,
+                icon = debuff.icon
+            })
+        end
+        
+        OpenMenu(menu, row)
+    end)
     
     spellEdit:SetScript("OnEnterPressed", function(self) self:ClearFocus(); SaveData() end)
     primaryEdit:SetScript("OnEnterPressed", function(self) self:ClearFocus(); SaveData() end)
@@ -163,16 +231,65 @@ local function CreateAssignmentRow(parent, index, data, yOffset)
         self.data = newData
         self:SetPoint("TOPLEFT", parent, "TOPLEFT", 10, newY)
         
-        spellEdit:SetText(newData.spellId and tostring(newData.spellId) or "")
+        local spellName = newData.spellId and GetSpellInfo(newData.spellId) or ""
+        spellEdit:SetText(spellName)
         if newData.spellId then
             iconTx:SetTexture(GetSpellTexture(newData.spellId))
+            
+            -- Re-validate on update
+            local ok, errCode = ns.SmartSelection:Validate(newData.primary, newData.spellId)
+            if not ok then
+                errorIcon:Show()
+                self.error = L["ERR_" .. errCode] or errCode
+            else
+                errorIcon:Hide()
+                self.error = nil
+            end
         else
             iconTx:SetTexture(nil)
+            errorIcon:Hide()
         end
         primaryEdit:SetText(newData.primary or "")
         backupEdit:SetText(newData.backup or "")
         delayEdit:SetText(tostring(newData.combatDelay or 3))
     end
+
+    local function ShowPlayerMenu(editBox)
+        if not row.data or not row.data.spellId then return end
+        
+        local debuffInfo = nil
+        for name, info in pairs(ns.Data.Debuffs) do
+            if info.id == row.data.spellId then debuffInfo = info; break end
+        end
+        if not debuffInfo then return end
+
+        local players = ns.SmartSelection:GetPlayersByClass(debuffInfo.class)
+        if #players == 0 then return end
+
+        local menu = {
+            { text = L["SUGGESTED_PLAYERS"] .. " (" .. debuffInfo.class .. ")", isTitle = true, notCheckable = true }
+        }
+        for _, pName in ipairs(players) do
+            table.insert(menu, {
+                text = pName,
+                func = function()
+                    editBox:SetText(pName)
+                    SaveData()
+                end,
+                notCheckable = true
+            })
+        end
+
+        OpenMenu(menu, row)
+    end
+
+    -- Hook right click on names to show menu
+    primaryEdit:SetScript("OnMouseUp", function(self, button)
+        if button == "RightButton" then ShowPlayerMenu(self) end
+    end)
+    backupEdit:SetScript("OnMouseUp", function(self, button)
+        if button == "RightButton" then ShowPlayerMenu(self) end
+    end)
     
     upBtn:SetScript("OnClick", function()
         if row.idx > 1 then
@@ -249,7 +366,7 @@ function ns.ConfigUI:Init()
     if mainFrame then return end
     
     mainFrame = CreateFrame("Frame", "NDNL_ConfigUI", UIParent, "BasicFrameTemplateWithInset")
-    mainFrame:SetSize(600, 400)
+    mainFrame:SetSize(720, 450)
     mainFrame:SetPoint("CENTER")
     mainFrame:SetMovable(true)
     mainFrame:EnableMouse(true)
@@ -263,23 +380,23 @@ function ns.ConfigUI:Init()
     
     -- Headers
     local hTarget = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hTarget:SetPoint("TOPLEFT", 30, -35)
+    hTarget:SetPoint("TOPLEFT", 35, -35)
     hTarget:SetText(L["CONFIG_SPELL"])
     
     local hPrimary = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hPrimary:SetPoint("LEFT", hTarget, "RIGHT", 60, 0)
+    hPrimary:SetPoint("TOPLEFT", 215, -35)
     hPrimary:SetText(L["CONFIG_PRIMARY"])
     
     local hBackup = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hBackup:SetPoint("LEFT", hPrimary, "RIGHT", 65, 0)
+    hBackup:SetPoint("TOPLEFT", 340, -35)
     hBackup:SetText(L["CONFIG_BACKUP"])
     
     local hDelay = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hDelay:SetPoint("LEFT", hBackup, "RIGHT", 70, 0)
+    hDelay:SetPoint("TOPLEFT", 475, -35)
     hDelay:SetText(L["CONFIG_DELAY"])
     
     local hPrio = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hPrio:SetPoint("LEFT", hDelay, "RIGHT", 35, 0)
+    hPrio:SetPoint("TOPLEFT", 545, -35)
     hPrio:SetText(L["CONFIG_PRIORITY"])
     
     DrawLine(mainFrame, -55)
@@ -344,6 +461,9 @@ end
 
 function ns.ConfigUI:Show()
     if not mainFrame then self:Init() end
+    if ns.TalentScanner and ns.TalentScanner.ScanGroup then
+        ns.TalentScanner:ScanGroup()
+    end
     self:Refresh()
     mainFrame:Show()
 end

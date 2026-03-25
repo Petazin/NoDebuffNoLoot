@@ -93,7 +93,7 @@ function UI:Clear()
     frame:Hide()
 end
 
-function UI:SetStatus(debuffId, debuffName, status, timeLeft, assignedPlayer, backupPlayer, iconPath)
+function UI:SetStatus(debuffId, debuffName, status, timeLeft, assignedPlayer, backupPlayer, iconPath, talentError)
     if not frame then self:Init() end
     frame:Show()
     
@@ -119,7 +119,22 @@ function UI:SetStatus(debuffId, debuffName, status, timeLeft, assignedPlayer, ba
         glow:Hide()
         row.glow = glow
         
+        -- Icono de error de talento
+        local warnIcon = row:CreateTexture(nil, "OVERLAY")
+        warnIcon:SetSize(12, 12)
+        warnIcon:SetPoint("RIGHT", 0, 0)
+        warnIcon:SetTexture("Interface\\DialogFrame\\UI-Dialog-Icon-AlertNew")
+        warnIcon:Hide()
+        row.warnIcon = warnIcon
+        
         frame.rows[debuffId] = row
+    end
+    
+    -- Manejar error de talento (icono de advertencia)
+    if talentError then
+        row.warnIcon:Show()
+    else
+        row.warnIcon:Hide()
     end
     
     row:Show()

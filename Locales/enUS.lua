@@ -60,3 +60,10 @@ L["STATUS_IDLE"] = "Waiting Target..."
 L["LDB_CLICK_TOGGLE"] = "|cFFEDA55FClick|r to Toggle HUD"
 L["LDB_SHIFT_CLICK_ASSIGNMENTS"] = "|cFFEDA55FShift-Click|r for Assignments"
 L["LDB_RIGHT_CLICK_OPTIONS"] = "|cFFEDA55FRight-Click|r for Options"
+
+-- Intelligence v2.3.0
+L["ERR_WRONG_CLASS"] = "Wrong class for this debuff."
+L["ERR_MISSING_TALENT"] = "Player missing required talent."
+L["SUGGESTED_DEBUFFS"] = "Suggested Debuffs"
+L["SUGGESTED_PLAYERS"] = "Suggested Players"
+L["IMPROVED"] = "Improved"

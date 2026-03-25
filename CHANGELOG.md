@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.3.5] - 2026-03-25
+
+### Fixed - v2.3.5
+- **Range-Based Sync Control**: Restricted transmission and reception of assignments to Group Leaders and Assistants only, preventing unauthorized configuration changes from other group members.
+
+## [2.3.4] - 2026-03-24
+- **SmartSelection Bugfix**: Resolved `attempt to index global 'L' (a nil value)` in `SmartSelection.lua` by ensuring proper local localization scope.
+
+## [2.3.3] - 2026-03-24
+- **UI & Localization Polish**: Expanded main panel width (720px) to prevent text clipping and added auto-localization for spell names in suggestion menus.
+
+## [2.3.2] - 2026-03-23
+- **EasyMenu Fix**: Replaced deprecated `EasyMenu` with a native `Dropdown` implementation to avoid nil global errors.
+
+## [2.3.1] - 2026-03-23
+- **Talent Inspection Fix**: Resolved `bad argument #2` in `GetTalentInfo` and cleaned up duplicate entries in the debuff database.
+
+## [2.3.0] - 2026-03-23
+
+### Added - v2.3.0
+- **Assignment Intelligence (TBC Focus)**:
+    - **Talent Scanner**: Automatic detection of critical specializations (Shadow Weaving, Improved Scorch, etc.) via raid inspection.
+    - **Dynamic Filtering**: Suggested debuff list now adapts automatically based on classes and talents found in the group.
+    - **Safety Validation**: Visual alert icons warning of incorrect class/talent assignments.
+    - **Smart UI**: New contextual menus for rapid selection of spells and players.
+
+---
+
 ## [2.2.0] - 2026-03-09
 
 ### Added - v2.2.0

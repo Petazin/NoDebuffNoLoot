@@ -185,6 +185,13 @@ function NoDebuffNoLoot:UpdateTracker()
             end
 
             -- Si no validamos playerName, se muestra todo (según filtro)
+            -- Validar si el encargado tiene el talento
+            local talentOk = true
+            if ns.SmartSelection and ns.SmartSelection.Validate then
+                talentOk = ns.SmartSelection:Validate(assignedPlayer, debuffId)
+            end
+
+            -- Si no validamos playerName, se muestra todo (según filtro)
             if not self.db.profile.hud.filterMine or assignedPlayer == playerName or backupPlayer == playerName then
                 
                 -- Inicializar el estado de alertas de este debuff si no existe (usamos el ID como key ahora)
@@ -192,7 +199,7 @@ function NoDebuffNoLoot:UpdateTracker()
             
                 if not validTarget then
                     -- Mostrar HUD inactivo (IDLE) si no hay target pero está el override "alwaysShow"
-                    ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon)
+                    ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon, not talentOk)
                     alertStates[debuffId].missing = false
                     alertStates[debuffId].expire = false
                 elseif activeData then
@@ -201,7 +208,7 @@ function NoDebuffNoLoot:UpdateTracker()
                     if self.db.profile.hud.onlyMissing then
                         if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
                     else
-                        ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon)
+                        ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon, not talentOk)
                     end
                     
                     -- Alerta de expiración
@@ -220,10 +227,10 @@ function NoDebuffNoLoot:UpdateTracker()
                     local inGracePeriod = inCombat and (GetTime() - combatStartTime < delay)
 
                     if not inCombat or inGracePeriod then
-                        ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon)
+                        ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon, not talentOk)
                         alertStates[debuffId].missing = false
                     else
-                        ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon)
+                        ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon, not talentOk)
                         
                         -- Alerta de missing dura (solo a los encargados)
                         if (assignedPlayer == playerName or backupPlayer == playerName) and not alertStates[debuffId].missing then

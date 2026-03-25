@@ -60,3 +60,10 @@ L["STATUS_IDLE"] = "Esperando objetivo..."
 L["LDB_CLICK_TOGGLE"] = "|cFFEDA55FClick|r alternar el HUD"
 L["LDB_SHIFT_CLICK_ASSIGNMENTS"] = "|cFFEDA55FShift-Click|r para Asignaciones"
 L["LDB_RIGHT_CLICK_OPTIONS"] = "|cFFEDA55FClick-Derecho|r para Opciones"
+
+-- Inteligencia v2.3.0
+L["ERR_WRONG_CLASS"] = "Clase incorrecta para este debuff."
+L["ERR_MISSING_TALENT"] = "Jugador no tiene el talento requerido."
+L["SUGGESTED_DEBUFFS"] = "Debuffs Sugeridos"
+L["SUGGESTED_PLAYERS"] = "Jugadores Sugeridos"
+L["IMPROVED"] = "Mejorado"

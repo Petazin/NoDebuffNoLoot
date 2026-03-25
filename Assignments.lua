@@ -33,6 +33,12 @@ end
 function Assignments:PushConfiguration()
     if not (IsInRaid() or IsInGroup()) then return end
     
+    -- Solo el líder o asistentes pueden enviar la configuración
+    local isLeader = UnitIsGroupLeader("player")
+    local isAssistant = UnitIsGroupAssistant("player")
+    
+    if not (isLeader or isAssistant) then return end
+
     local data = NoDebuffNoLoot.db.profile.assignments
     local serialized = AceSerializer:Serialize(data)
     
@@ -42,6 +48,31 @@ end
 
 function Assignments:OnCommReceived(prefix, message, distribution, sender)
     if prefix ~= COMM_PREFIX or sender == UnitName("player") then return end
+    
+    -- Validar que el remitente es Líder o Ayudante antes de aceptar cambios
+    -- Buscamos el rango del remitente en el grupo/raid
+    local senderIsAuthorized = false
+    local numGroup = GetNumGroupMembers()
+    
+    if IsInRaid() then
+        for i = 1, numGroup do
+            local name, rank = GetRaidRosterInfo(i)
+            if name == sender then
+                if rank > 0 then senderIsAuthorized = true end -- 1 = Assistant, 2 = Leader
+                break
+            end
+        end
+    else
+        -- En Party, el líder es el único con autoridad
+        if UnitIsGroupLeader(sender) then
+            senderIsAuthorized = true
+        end
+    end
+
+    if not senderIsAuthorized then 
+        -- Opcional: Loggear intento de desincronización no autorizada? Por ahora ignorar.
+        return 
+    end
     
     local success, data = AceSerializer:Deserialize(message)
     if success then
