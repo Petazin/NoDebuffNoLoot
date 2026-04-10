@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.4.1] - 2026-04-01
+
+### Fixed - v2.4.1
+- **Assignment Blank Issue (Expose Armor)**: Corrected a bug where assigning "Improved Expose Armor" caused the assignment field to clear instantly. The database mistakenly pointed to the passive talent (Spell ID 26866) instead of the active debuff ability (Spell ID 8647), preventing the localized name lookup from working.
+- **Spell ID Database Audit**: Performed a full review of all spell IDs in the central `Data.lua` registry. Corrected multiple entries that were mistakenly pointing to passive talents, low ranks, or unrelated quest IDs instead of the active debuff applied to enemies:
+  - **Winter's Chill**: Updated from passive talent (28593) to debuff aura (12579).
+  - **Judgement of Light**: Updated from quest ID (27163) to unranked debuff aura (20185).
+  - **Judgement of Wisdom**: Updated from quest ID (27164) to unranked debuff aura (20186).
+  - **Curse of Recklessness**: Updated from creature ID (27226) to Rank 5 debuff (27223).
+  - **Curse of Weakness**: Updated from creature ID (27224) to Rank 8 debuff (30909).
+  - **Demoralizing Roar**: Updated from quest ID (26998) to Rank 6 debuff (8983).
+  - **Screech (Hunter Pet)**: Updated from Rank 4 (27050) to Rank 5 debuff (31480).
+- **Improved Smart Validation**: Tuned `SmartSelection.lua` to properly prioritize the strictest assignment validation (Talent Requirement) when multiple dictionary spells share the same ability ID (e.g. baseline Expose Armor vs. Improved Expose Armor).
+## [2.4.0] - 2026-03-31
+
+### Added - v2.4.0
+- **Smart Overwrite (Warrior/Rogue)**: Sunder Armor will now be silently satisfied and hidden from missing alerts if Expose Armor (or Improved) is applied, preventing Warrior frustration.
+- **Smart Suggest**: The Leader's assignment dropdown menu now filters in real-time, prioritizing or hiding basic versions of spells if a valid player with an Improved Talent version is found in the group.
+
+### Fixed - v2.4.0
+- **Faerie Fire ID**: Corrected an erroneous spell ID for Faerie Fire that was causing the Rebirth icon to display instead of the correct purple moon icon.
+
+---
+
 ## [2.3.5] - 2026-03-25
 
 ### Fixed - v2.3.5

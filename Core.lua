@@ -184,6 +184,15 @@ function NoDebuffNoLoot:UpdateTracker()
                 end
             end
 
+            -- Smart Overwrite: Expose Armor and Improved Expose Armor overrides Sunder Armor requirement
+            if debuffId == 25225 and not activeData then --> 25225 = Sunder Armor
+                if activeDebuffs["Improved Expose Armor"] then
+                    activeData = activeDebuffs["Improved Expose Armor"]
+                elseif activeDebuffs["Expose Armor"] then
+                    activeData = activeDebuffs["Expose Armor"]
+                end
+            end
+
             -- Si no validamos playerName, se muestra todo (según filtro)
             -- Validar si el encargado tiene el talento
             local talentOk = true

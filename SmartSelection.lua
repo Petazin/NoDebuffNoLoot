@@ -29,24 +29,60 @@ function ns.SmartSelection:GetAvailableDebuffs()
     local activeClasses = self:GetActiveClasses()
     local available = {}
     
+    -- 1. Analizar qué variaciones de talento posee REALMENTE el grupo en vivo
+    local presentTalents = {}
+    if ns.TalentScanner then
+        for name, info in pairs(ns.Data.Debuffs) do
+            if info.talentId and activeClasses[info.class] then
+                local players = self:GetPlayersByClass(info.class)
+                for _, player in ipairs(players) do
+                    if ns.TalentScanner:HasTalent(player, info.talentId) then
+                        presentTalents[name] = true
+                        break
+                    end
+                end
+            end
+        end
+    end
+    
+    -- 2. Poblar opciones inteligibles
     for name, info in pairs(ns.Data.Debuffs) do
         if activeClasses[info.class] then
-            -- Verificación opcional de talentos (si al menos alguien de esa clase lo tiene)
-            -- Por ahora, si la clase existe, mostramos el debuff como sugerencia
-            local localizedName, _, spellIcon = GetSpellInfo(info.id)
-            local displayName = localizedName or name
-            if info.talentId then
-                displayName = displayName .. " (" .. L["IMPROVED"] .. ")"
+            local offer = false
+            local skip = false
+
+            -- Filtrar duplicidad o versiones menores si el equipo cuenta con la variante Mejorada
+            if name == "Faerie Fire" and presentTalents["Improved Faerie Fire"] then skip = true end
+            if name == "Expose Armor" and presentTalents["Improved Expose Armor"] then skip = true end
+            if name == "Sunder Armor" and presentTalents["Improved Expose Armor"] then skip = true end
+
+            if not skip then
+                -- Si esto requiere talento, solo dar la opción si de verdad alguien en la party lo tiene (Smart Suggest)
+                if info.talentId then
+                    if presentTalents[name] then offer = true end
+                else
+                    offer = true
+                end
             end
             
-            table.insert(available, {
-                name = displayName,
-                id = info.id,
-                class = info.class,
-                priority = info.priority,
-                talentId = info.talentId,
-                icon = spellIcon or info.icon
-            })
+            if offer then
+                local localizedName, _, spellIcon = GetSpellInfo(info.id)
+                local displayName = localizedName or name
+                
+                -- Agregamos la etiqueta visual (Mejorado) si provino de un talento vivo
+                if info.talentId then
+                    displayName = displayName .. " (" .. L["IMPROVED"] .. ")"
+                end
+                
+                table.insert(available, {
+                    name = displayName,
+                    id = info.id,
+                    class = info.class,
+                    priority = info.priority,
+                    talentId = info.talentId,
+                    icon = spellIcon or info.icon
+                })
+            end
         end
     end
     
@@ -89,8 +125,10 @@ function ns.SmartSelection:Validate(playerName, spellId)
     local debuffInfo = nil
     for name, info in pairs(ns.Data.Debuffs) do
         if info.id == spellId then
-            debuffInfo = info
-            break
+            -- Priorizar la variante con talentId para comprobaciones más estrictas
+            if not debuffInfo or info.talentId then
+                debuffInfo = info
+            end
         end
     end
     
