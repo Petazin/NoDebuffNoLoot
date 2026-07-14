@@ -67,3 +67,16 @@ L["ERR_MISSING_TALENT"] = "Player missing required talent."
 L["SUGGESTED_DEBUFFS"] = "Suggested Debuffs"
 L["SUGGESTED_PLAYERS"] = "Suggested Players"
 L["IMPROVED"] = "Improved"
+L["CONFIG_DELEGATE"] = "Co-Assigner:"
+
+-- HUD Redesign v2.6.0
+L["OPT_HUD_SCALE"] = "HUD Scale"
+L["OPT_HUD_SCALE_DESC"] = "Adjust the overall scale of the HUD interface."
+L["OPT_HUD_WIDTH"] = "HUD Width"
+L["OPT_HUD_WIDTH_DESC"] = "Adjust the pixel width of the HUD bars."
+L["OPT_SHOW_SPELL_NAME"] = "Show Spell Name"
+L["OPT_SHOW_SPELL_NAME_DESC"] = "If disabled, only the icon and player name will be shown on the HUD, hiding the spell name."
+L["OPT_PRE_RAID_ALL"] = "All Classes (Pre-Raid)"
+L["OPT_ALERT_TOOLTIP_FORMAT"] = "|cFFFF8800Optimization Available!|r\nThe assigned player does not have the improved talent, but there are players of their class who have it and are free:%s\n\n|cFFFFD100It is recommended to change the assignment.|r"
+
+

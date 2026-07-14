@@ -67,3 +67,16 @@ L["ERR_MISSING_TALENT"] = "Jugador no tiene el talento requerido."
 L["SUGGESTED_DEBUFFS"] = "Debuffs Sugeridos"
 L["SUGGESTED_PLAYERS"] = "Jugadores Sugeridos"
 L["IMPROVED"] = "Mejorado"
+L["CONFIG_DELEGATE"] = "Co-Asignador:"
+
+-- Rediseño HUD v2.6.0
+L["OPT_HUD_SCALE"] = "Escala del HUD"
+L["OPT_HUD_SCALE_DESC"] = "Ajusta el tamaño general (escala) de la interfaz del HUD."
+L["OPT_HUD_WIDTH"] = "Ancho del HUD"
+L["OPT_HUD_WIDTH_DESC"] = "Ajusta el ancho en píxeles de las barras del HUD."
+L["OPT_SHOW_SPELL_NAME"] = "Mostrar nombre de hechizo"
+L["OPT_SHOW_SPELL_NAME_DESC"] = "Si se desactiva, solo se verá el icono y el nombre del jugador, ocultando el nombre del hechizo."
+L["OPT_PRE_RAID_ALL"] = "Todas las Clases (Pre-Raid)"
+L["OPT_ALERT_TOOLTIP_FORMAT"] = "|cFFFF8800¡Optimización Disponible!|r\nEl encargado actual no posee el talento mejorado, pero hay jugadores de su clase que sí lo tienen y están libres:%s\n\n|cFFFFD100Se recomienda cambiar la asignación.|r"
+
+

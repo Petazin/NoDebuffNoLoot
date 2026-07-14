@@ -86,6 +86,46 @@ local options = {
                     order = 5,
                     width = "full",
                 },
+                scale = {
+                    type = "range",
+                    name = L["OPT_HUD_SCALE"] or "Escala del HUD",
+                    desc = L["OPT_HUD_SCALE_DESC"] or "Ajusta el tamaño general de la interfaz del HUD.",
+                    min = 0.5,
+                    max = 2.0,
+                    step = 0.05,
+                    get = function() return NoDebuffNoLoot.db.profile.hud.scale or 1.0 end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.scale = val
+                        if ns.UI and ns.UI.UpdateLayout then ns.UI:UpdateLayout() end
+                    end,
+                    order = 6,
+                },
+                width = {
+                    type = "range",
+                    name = L["OPT_HUD_WIDTH"] or "Ancho del HUD",
+                    desc = L["OPT_HUD_WIDTH_DESC"] or "Ajusta el ancho de las barras del HUD en píxeles.",
+                    min = 120,
+                    max = 400,
+                    step = 5,
+                    get = function() return NoDebuffNoLoot.db.profile.hud.width or 220 end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.width = val
+                        if ns.UI and ns.UI.UpdateLayout then ns.UI:UpdateLayout() end
+                    end,
+                    order = 7,
+                },
+                showSpellName = {
+                    type = "toggle",
+                    name = L["OPT_SHOW_SPELL_NAME"] or "Mostrar nombre de hechizo",
+                    desc = L["OPT_SHOW_SPELL_NAME_DESC"] or "Muestra u oculta el nombre del hechizo en el HUD para ahorrar espacio.",
+                    get = function() return NoDebuffNoLoot.db.profile.hud.showSpellName ~= false end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.showSpellName = val
+                        NoDebuffNoLoot:UpdateTracker()
+                    end,
+                    order = 8,
+                    width = "full",
+                },
                 alertsHeader = {
                     type = "header",
                     name = L["OPT_ALERTS_HEADER"],

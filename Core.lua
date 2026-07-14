@@ -30,11 +30,14 @@ local defaults = {
         assignments = {
             -- Lista ordenada por defecto. Fallback. [1] = { debuff = "Sunder Armor", primary = "", backup = "" }
         },
+        delegate = "", -- Nombre del Co-Asignador Delegado
         hud = {
             shown = true,
             alwaysShow = false,
             locked = false,
             scale = 1.0,
+            width = 220,
+            showSpellName = true,
             x = 0,
             y = 0,
             filterMine = false,
@@ -63,6 +66,15 @@ local combatStartTime = 0
 function NoDebuffNoLoot:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("NoDebuffNoLootDB", defaults, true)
     
+    -- Migración de IDs antiguos de Curse of Recklessness corruptos (27223 y 11718 -> 11717)
+    if self.db.profile.assignments then
+        for _, assignment in ipairs(self.db.profile.assignments) do
+            if assignment.spellId == 27223 or assignment.spellId == 11718 then
+                assignment.spellId = 11717
+            end
+        end
+    end
+    
     -- Generar mapeo de nombres localizados usando los IDs de Data.lua
     for englishName, info in pairs(ns.Data.Debuffs) do
         local localizedName = GetSpellInfo(info.id)
@@ -89,7 +101,8 @@ function NoDebuffNoLoot:OpenOptions()
     -- Detectar si estamos en un cliente moderno (Anniversary/Retail) o clásico antiguo
     if Settings and Settings.OpenToCategory then
         -- WoW Moderno (10.0+ o Classic Anniversary)
-        Settings.OpenToCategory("NoDebuffNoLoot")
+        local categoryID = (self.optionsFrame and self.optionsFrame.name) or "NoDebuffNoLoot"
+        Settings.OpenToCategory(categoryID)
     elseif InterfaceOptionsFrame_OpenToCategory then
         -- WoW Clásico Antiguo / TBC Original build
         if self.optionsFrame then
@@ -148,17 +161,16 @@ function NoDebuffNoLoot:UpdateTracker()
             local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitAura("target", i, "HARMFUL")
             if not name then break end
             
-            -- Si este debuff localizado está en nuestra base de datos, lo guardamos
-            local englishKey = localizedToEnglish[name]
-            if englishKey then
-                activeDebuffs[englishKey] = {
-                    name = name,
-                    icon = icon,
-                    duration = duration,
-                    expirationTime = expirationTime,
-                    spellId = spellId
-                }
-            end
+            -- Guardamos el debuff tanto por su Spell ID como por su Nombre localizado en minúsculas (para soportar rangos)
+            local data = {
+                name = name,
+                icon = icon,
+                duration = duration,
+                expirationTime = expirationTime,
+                spellId = spellId
+            }
+            activeDebuffs[spellId] = data
+            activeDebuffs[string.lower(name)] = data
         end
     end
 
@@ -173,31 +185,50 @@ function NoDebuffNoLoot:UpdateTracker()
             local debuffName = GetSpellInfo(debuffId)
             local icon = GetSpellTexture(debuffId)
             
-            -- Para buscar en activeDebuffs, necesitamos el nombre en inglés o usar la caché
-            -- La nueva lógica puede simplemente comparar el spellId directamente con activeDebuffs
-            -- Vamos a simplificar: buscamos si activeDebuffs tiene este spellId
-            local activeData = nil
-            for _, ad in pairs(activeDebuffs) do
-                if ad.spellId == debuffId or ad.name == debuffName then
-                    activeData = ad
-                    break
-                end
+            -- Buscar si el debuff está activo en el objetivo (por ID o por coincidencia de nombre localizado)
+            local activeData = activeDebuffs[debuffId]
+            if not activeData and debuffName then
+                activeData = activeDebuffs[string.lower(debuffName)]
             end
 
-            -- Smart Overwrite: Expose Armor and Improved Expose Armor overrides Sunder Armor requirement
+            -- Smart Overwrite: Expose Armor overrides Sunder Armor requirement
             if debuffId == 25225 and not activeData then --> 25225 = Sunder Armor
-                if activeDebuffs["Improved Expose Armor"] then
-                    activeData = activeDebuffs["Improved Expose Armor"]
-                elseif activeDebuffs["Expose Armor"] then
-                    activeData = activeDebuffs["Expose Armor"]
+                local exposeName = GetSpellInfo(8647)
+                if exposeName and activeDebuffs[string.lower(exposeName)] then
+                    activeData = activeDebuffs[string.lower(exposeName)]
+                end
+            end
+            
+            -- Smart Overwrite: Demoralizing Shout (Guerrero) y Demoralizing Roar (Druida) se satisfacen mutuamente
+            if debuffId == 25203 and not activeData then --> 25203 = Demoralizing Shout
+                local roarName = GetSpellInfo(8983)
+                if roarName and activeDebuffs[string.lower(roarName)] then
+                    activeData = activeDebuffs[string.lower(roarName)]
+                end
+            elseif debuffId == 8983 and not activeData then --> 8983 = Demoralizing Roar
+                local shoutName = GetSpellInfo(25203)
+                if shoutName and activeDebuffs[string.lower(shoutName)] then
+                    activeData = activeDebuffs[string.lower(shoutName)]
                 end
             end
 
             -- Si no validamos playerName, se muestra todo (según filtro)
-            -- Validar si el encargado tiene el talento
+            -- Validar si el encargado tiene la clase correcta
             local talentOk = true
             if ns.SmartSelection and ns.SmartSelection.Validate then
                 talentOk = ns.SmartSelection:Validate(assignedPlayer, debuffId)
+            end
+            
+            -- Detectar si el encargado posee el talento de mejora
+            local hasTalent = false
+            if ns.TalentScanner and assignedPlayer and assignedPlayer ~= "" then
+                local debuffInfo = nil
+                for name, info in pairs(ns.Data.Debuffs) do
+                    if info.id == debuffId then debuffInfo = info; break end
+                end
+                if debuffInfo and debuffInfo.talentId then
+                    hasTalent = ns.TalentScanner:HasTalent(assignedPlayer, debuffInfo.talentId) == true
+                end
             end
 
             -- Si no validamos playerName, se muestra todo (según filtro)
@@ -208,7 +239,7 @@ function NoDebuffNoLoot:UpdateTracker()
             
                 if not validTarget then
                     -- Mostrar HUD inactivo (IDLE) si no hay target pero está el override "alwaysShow"
-                    ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon, not talentOk)
+                    ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
                     alertStates[debuffId].missing = false
                     alertStates[debuffId].expire = false
                 elseif activeData then
@@ -217,7 +248,7 @@ function NoDebuffNoLoot:UpdateTracker()
                     if self.db.profile.hud.onlyMissing then
                         if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
                     else
-                        ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon, not talentOk)
+                        ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon, not talentOk, hasTalent)
                     end
                     
                     -- Alerta de expiración
@@ -236,10 +267,10 @@ function NoDebuffNoLoot:UpdateTracker()
                     local inGracePeriod = inCombat and (GetTime() - combatStartTime < delay)
 
                     if not inCombat or inGracePeriod then
-                        ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon, not talentOk)
+                        ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
                         alertStates[debuffId].missing = false
                     else
-                        ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon, not talentOk)
+                        ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
                         
                         -- Alerta de missing dura (solo a los encargados)
                         if (assignedPlayer == playerName or backupPlayer == playerName) and not alertStates[debuffId].missing then
@@ -263,6 +294,10 @@ function NoDebuffNoLoot:UpdateTracker()
                 if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
             end
         end
+    end
+    
+    if ns.UI and ns.UI.UpdateLayout then
+        ns.UI:UpdateLayout()
     end
 end
 

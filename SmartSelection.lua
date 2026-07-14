@@ -29,60 +29,19 @@ function ns.SmartSelection:GetAvailableDebuffs()
     local activeClasses = self:GetActiveClasses()
     local available = {}
     
-    -- 1. Analizar qué variaciones de talento posee REALMENTE el grupo en vivo
-    local presentTalents = {}
-    if ns.TalentScanner then
-        for name, info in pairs(ns.Data.Debuffs) do
-            if info.talentId and activeClasses[info.class] then
-                local players = self:GetPlayersByClass(info.class)
-                for _, player in ipairs(players) do
-                    if ns.TalentScanner:HasTalent(player, info.talentId) then
-                        presentTalents[name] = true
-                        break
-                    end
-                end
-            end
-        end
-    end
-    
-    -- 2. Poblar opciones inteligibles
     for name, info in pairs(ns.Data.Debuffs) do
         if activeClasses[info.class] then
-            local offer = false
-            local skip = false
-
-            -- Filtrar duplicidad o versiones menores si el equipo cuenta con la variante Mejorada
-            if name == "Faerie Fire" and presentTalents["Improved Faerie Fire"] then skip = true end
-            if name == "Expose Armor" and presentTalents["Improved Expose Armor"] then skip = true end
-            if name == "Sunder Armor" and presentTalents["Improved Expose Armor"] then skip = true end
-
-            if not skip then
-                -- Si esto requiere talento, solo dar la opción si de verdad alguien en la party lo tiene (Smart Suggest)
-                if info.talentId then
-                    if presentTalents[name] then offer = true end
-                else
-                    offer = true
-                end
-            end
+            local localizedName, _, spellIcon = GetSpellInfo(info.id)
+            local displayName = localizedName or name
             
-            if offer then
-                local localizedName, _, spellIcon = GetSpellInfo(info.id)
-                local displayName = localizedName or name
-                
-                -- Agregamos la etiqueta visual (Mejorado) si provino de un talento vivo
-                if info.talentId then
-                    displayName = displayName .. " (" .. L["IMPROVED"] .. ")"
-                end
-                
-                table.insert(available, {
-                    name = displayName,
-                    id = info.id,
-                    class = info.class,
-                    priority = info.priority,
-                    talentId = info.talentId,
-                    icon = spellIcon or info.icon
-                })
-            end
+            table.insert(available, {
+                name = displayName,
+                id = info.id,
+                class = info.class,
+                priority = info.priority,
+                talentId = info.talentId,
+                icon = spellIcon or info.icon
+            })
         end
     end
     
@@ -120,22 +79,45 @@ function ns.SmartSelection:GetPlayersByClass(targetClass)
     return players
 end
 
+-- Obtener jugadores de la clase del debuff que posean el talento óptimo/mejorado
+function ns.SmartSelection:GetOptimalPlayersForDebuff(spellId)
+    local debuffInfo = nil
+    for name, info in pairs(ns.Data.Debuffs) do
+        if info.id == spellId then
+            debuffInfo = info
+            break
+        end
+    end
+    
+    if not debuffInfo or not debuffInfo.talentId then return {} end
+    
+    local players = self:GetPlayersByClass(debuffInfo.class)
+    local optimal = {}
+    
+    if ns.TalentScanner then
+        for _, playerName in ipairs(players) do
+            if ns.TalentScanner:HasTalent(playerName, debuffInfo.talentId) then
+                table.insert(optimal, playerName)
+            end
+        end
+    end
+    
+    return optimal
+end
+
 -- Validar una asignación específica
 function ns.SmartSelection:Validate(playerName, spellId)
     local debuffInfo = nil
     for name, info in pairs(ns.Data.Debuffs) do
         if info.id == spellId then
-            -- Priorizar la variante con talentId para comprobaciones más estrictas
-            if not debuffInfo or info.talentId then
-                debuffInfo = info
-            end
+            debuffInfo = info
+            break
         end
     end
     
     if not debuffInfo then return true end -- Spell desconocido, no validamos
     
     -- Verificar clase
-    -- Nota: GetPlayerClass es costoso o requiere que el PJ esté en el grupo
     local unit = nil
     if IsInRaid() then
         for i=1, GetNumGroupMembers() do
@@ -154,13 +136,8 @@ function ns.SmartSelection:Validate(playerName, spellId)
             return false, "WRONG_CLASS"
         end
         
-        -- Verificar talento si aplica
-        if debuffInfo.talentId and ns.TalentScanner then
-            local hasTalent = ns.TalentScanner:HasTalent(playerName, debuffInfo.talentId)
-            if hasTalent == false then
-                return false, "MISSING_TALENT"
-            end
-        end
+        -- Fallback suave: El validador ya no arroja error de talento faltante (MISSING_TALENT).
+        -- El talento ahora se valida dinámicamente en el HUD y en el recomendador de optimizaciones.
     end
     
     return true

@@ -4,6 +4,74 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.6.4] - 2026-07-14
+
+### Added - v2.6.4
+- **Debuffs Inteligentes y Unificados**: Eliminadas las versiones duplicadas de debuffs normales y mejorados por talento en la base de datos de `Data.lua`. Se maneja una única fila de configuración (ej. *Fuego feérico* o *Maldición de los elementos*) con su talento asociado de forma implícita.
+- **Validación con Fallback Suave**: Si el jugador asignado no posee el talento mejorado, la validación ya no devuelve un error estricto de bloqueo en el HUD ni en la fila, permitiendo que aplique el debuff básico. El HUD se adapta dinámicamente y añade ` (Mejorado)` al texto del debuff únicamente si el encargado cuenta con el talento.
+- **Recomendador de Optimización**: Nueva bombilla visual naranja (`optIcon`) en el panel de asignaciones. Si el asignado actual no tiene el talento, pero en la raid hay otro jugador de la misma clase libre (no asignado a debuffs superiores por prioridad de lista de arriba a abajo), el tooltip de la bombilla te sugerirá proactivamente a quién cambiar para maximizar los beneficios de la raid.
+- **Sugerencia Rápida Ordenada**: El menú de click derecho sobre Encargado/Suplente ahora ordena y sitúa arriba del todo a los jugadores que posean el talento óptimo, etiquetándolos con `★ Nombre (Mejorado)`.
+- **Sobrescritura de Poder de Ataque (AP)**: Implementada regla de sobrescritura inteligente mutua en `Core.lua` para *Grito desmoralizador* (Guerrero) y *Rugido desmoralizador* (Druida). Si cualquiera de los dos está activo en el objetivo, el HUD de ambas clases se considerará satisfecho (evitando falsos negativos en combate).
+- **Escáner de Auras Robusto**: Rediseñada la detección de debuffs en `Core.lua` para indexar el escaneo por Spell ID y Nombre localizado en minúsculas. Esto elimina por completo la dependencia del diccionario `localizedToEnglish` poblado en la inicialización (el cual fallaba si la caché de WoW estaba fría al abrir el juego) y permite detectar correctamente debuffs de cualquier nivel/rango (ej. Rugido Rango 5).
+
+---
+
+## [2.6.3] - 2026-07-13
+
+### Fixed - v2.6.3
+- **Búsqueda Inteligente de Hechizos**: Implementado algoritmo en `Data.lua` para resolver nombres de hechizos mediante coincidencia parcial (substrings) e insensible a mayúsculas/minúsculas. También detecta y corrige automáticamente errores comunes al escribir (ej: `"recleness"` o `"reck"` se asocian de inmediato a la *Maldición de temeridad*).
+- **Migración de Datos**: Añadido despachador en la inicialización del addon para migrar de forma transparente perfiles de usuario que tuviesen guardado el ID anterior y corrupto de *Maldición de temeridad* (`27223`) hacia el ID corregido (`11717`).
+
+---
+
+## [2.6.2] - 2026-07-13
+
+### Fixed - v2.6.2
+- **Spell IDs de Brujo (Maldiciones)**: Corregido el Spell ID de *Maldición de temeridad* (Curse of Recklessness) que erróneamente apuntaba a *Espiral de la muerte* (Death Coil).
+- **Maldiciones faltantes**: Añadidas *Maldición de la fatalidad* (Curse of Doom, Rango 2) y *Maldición de las lenguas* (Curse of Tongues, Rango 2) a la base de datos de debuffs del Brujo.
+
+---
+
+## [2.6.1] - 2026-07-13
+
+### Added - v2.6.1
+- **Asignación Pre-Raid (Menú Multinivel)**: Rediseñado el recomendador de debuffs (botón `+` en panel de asignaciones) para admitir una estructura multinivel agrupada por clase. Esto permite a los líderes de banda configurar de antemano cualquier debuff crítico en la base de datos de WoW sin requerir la presencia física de esa clase en el grupo en ese instante.
+- **Bugfix de UIDropDownMenu**: Corregido el error Lua `bad argument #1 to 'ipairs' (table expected, got string)` al desplegar el submenú pre-raid. Ahora se asigna la propiedad `value` de forma segura con la tabla de datos y se incluye una validación defensiva en `OpenMenu`.
+
+---
+
+## [2.6.0] - 2026-07-13
+
+### Added - v2.6.0
+- **Rediseño Híbrido del HUD (StatusBar + Clase)**: Sustituido el HUD textual simple por barras de estado minimalistas de WoW. Las barras se colorean dinámicamente con el color de clase del jugador asignado y se reducen progresivamente al estar activas.
+- **Visualización Condicional de Hechizo**: Añadida opción para mostrar/ocultar el nombre de la magia en el HUD para ahorrar espacio horizontal. Si se desactiva, el nombre del jugador se ancla directamente al icono.
+- **Control de Tamaño y Escala del HUD**: Añadidos controles deslizantes (Sliders) para la escala general (0.5x - 2.0x) y el ancho de las barras (120px - 400px), aplicados y actualizados en tiempo real en la UI.
+- **Parpadeo Integrado**: Modificado el flash/glow de debuff faltante para iluminar de manera sutil la barra de progreso en lugar de toda la fila.
+
+---
+
+## [2.5.0] - 2026-07-13
+
+### Added - v2.5.0
+- **Co-Asignador Delegado (UI)**: Añadido selector visual en el panel de configuración para establecer un Co-Asignador Delegado.
+- **Sincronización de Delegado**: Sincronización robusta por red de addon del Co-Asignador asignado.
+- **Control de Permisos de Edición**: Los jugadores sin permisos de edición (Líder, Asistentes, Delegado) verán las opciones visuales y celdas de la interfaz bloqueadas (solo lectura).
+- **Protocolo de Red Unificado**: Modificación del sistema de red para soportar la transmisión conjunta de la tabla de asignaciones y el delegado usando serialización completa de AceSerializer.
+
+---
+
+## [2.4.3] - 2026-07-10
+
+### Fixed - v2.4.3
+- **HUD Row Overlap**: Fixed a bug where deleting or changing assignments caused old, deleted assignment rows ("orphan frames") to remain visible on the screen, creating overlapping text. The HUD layout updater now actively hides any rows that do not correspond to active assignments.
+- **Anchor Point Cleanup**: Added `r:ClearAllPoints()` before calling `r:SetPoint()` to prevent internal WoW engine anchor point accumulation.
+- **Empty State Handling**: Guaranteed that `UI:UpdateLayout()` is called at the end of the update tick so that the HUD properly hides itself when the assignment list becomes entirely empty.
+
+## [2.4.2] - 2026-07-09
+
+### Fixed - v2.4.2
+- **Interface Settings Crash**: Fixed a critical Lua error when trying to open the options panel on modern WoW clients (including Classic Anniversary Edition). The function `Settings.OpenToCategory` now uses the dynamic `categoryID` retrieved from the registered AceConfigDialog option frame (`self.optionsFrame.name`) instead of a hardcoded string, preventing parameter range errors in `OpenSettingsPanel`.
+
 ## [2.4.1] - 2026-04-01
 
 ### Fixed - v2.4.1
