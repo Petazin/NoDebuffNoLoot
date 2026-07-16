@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.6.5] - 2026-07-14
+
+### Added - v2.6.5
+- **Opción de Escaneo Restringido**: Añadido checkbox "Escanear solo en Instancia" (`scanOnlyInInstance`) en las opciones generales del addon. Si está activo, el escáner de talentos de grupo se desactiva fuera de Mazmorras y Bandas (Raid) para ahorrar recursos y evitar escaneos en ciudades o mundo abierto.
+
+### Fixed - v2.6.5
+- **Prevención de Error de Rango (Inspección)**: Añadida la verificación `CheckInteractDistance(unit, 1)` antes de realizar llamadas a la API nativa de inspección `NotifyInspect(unit)`. Esto previene de forma absoluta los molestos sonidos de error y textos en pantalla de `"Fuera de alcance"` o `"unidad desconocida"` cuando los miembros de la banda/grupo se encuentran alejados o en otra zona.
+
+---
+
 ## [2.6.4] - 2026-07-14
 
 ### Added - v2.6.4

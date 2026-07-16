@@ -78,5 +78,8 @@ L["OPT_SHOW_SPELL_NAME"] = "Mostrar nombre de hechizo"
 L["OPT_SHOW_SPELL_NAME_DESC"] = "Si se desactiva, solo se verá el icono y el nombre del jugador, ocultando el nombre del hechizo."
 L["OPT_PRE_RAID_ALL"] = "Todas las Clases (Pre-Raid)"
 L["OPT_ALERT_TOOLTIP_FORMAT"] = "|cFFFF8800¡Optimización Disponible!|r\nEl encargado actual no posee el talento mejorado, pero hay jugadores de su clase que sí lo tienen y están libres:%s\n\n|cFFFFD100Se recomienda cambiar la asignación.|r"
+L["OPT_SCAN_ONLY_IN_INSTANCE"] = "Escanear solo en Instancia"
+L["OPT_SCAN_ONLY_IN_INSTANCE_DESC"] = "Limita el escaneo de talentos de grupo para que solo se realice dentro de Mazmorras y Bandas (Raid)."
+
 
 

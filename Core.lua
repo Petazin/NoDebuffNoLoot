@@ -31,6 +31,7 @@ local defaults = {
             -- Lista ordenada por defecto. Fallback. [1] = { debuff = "Sunder Armor", primary = "", backup = "" }
         },
         delegate = "", -- Nombre del Co-Asignador Delegado
+        scanOnlyInInstance = false,
         hud = {
             shown = true,
             alwaysShow = false,

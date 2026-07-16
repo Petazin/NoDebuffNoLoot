@@ -78,5 +78,8 @@ L["OPT_SHOW_SPELL_NAME"] = "Show Spell Name"
 L["OPT_SHOW_SPELL_NAME_DESC"] = "If disabled, only the icon and player name will be shown on the HUD, hiding the spell name."
 L["OPT_PRE_RAID_ALL"] = "All Classes (Pre-Raid)"
 L["OPT_ALERT_TOOLTIP_FORMAT"] = "|cFFFF8800Optimization Available!|r\nThe assigned player does not have the improved talent, but there are players of their class who have it and are free:%s\n\n|cFFFFD100It is recommended to change the assignment.|r"
+L["OPT_SCAN_ONLY_IN_INSTANCE"] = "Scan Only in Instance"
+L["OPT_SCAN_ONLY_IN_INSTANCE_DESC"] = "Limits group talent scanning to only perform inside Dungeons and Raids."
+
 
 

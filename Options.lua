@@ -86,6 +86,17 @@ local options = {
                     order = 5,
                     width = "full",
                 },
+                scanOnlyInInstance = {
+                    type = "toggle",
+                    name = L["OPT_SCAN_ONLY_IN_INSTANCE"],
+                    desc = L["OPT_SCAN_ONLY_IN_INSTANCE_DESC"],
+                    get = function() return NoDebuffNoLoot.db.profile.scanOnlyInInstance end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.scanOnlyInInstance = val
+                    end,
+                    order = 5.5,
+                    width = "full",
+                },
                 scale = {
                     type = "range",
                     name = L["OPT_HUD_SCALE"] or "Escala del HUD",

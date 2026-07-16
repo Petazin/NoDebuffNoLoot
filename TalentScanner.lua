@@ -20,7 +20,7 @@ end
 TalentScanner:SetScript("OnEvent", TalentScanner.OnEvent)
 
 function TalentScanner:RequestInspect(unit)
-    if not unit or not CanInspect(unit) or not UnitIsConnected(unit) then return end
+    if not unit or not UnitExists(unit) or not CanInspect(unit) or not UnitIsConnected(unit) or not CheckInteractDistance(unit, 1) then return end
     
     local now = GetTime()
     if (now - lastInspectRequest) < INSPECT_COOLDOWN then return end
@@ -76,6 +76,13 @@ end
 function TalentScanner:ScanGroup()
     if not IsInGroup() then return end
     
+    -- Si la opción scanOnlyInInstance está activa, comprobar si estamos en instancia (mazmorra o banda)
+    if NoDebuffNoLoot.db.profile.scanOnlyInInstance then
+        local inInstance, instanceType = IsInInstance()
+        local inDungeonOrRaid = inInstance and (instanceType == "party" or instanceType == "raid")
+        if not inDungeonOrRaid then return end
+    end
+    
     local members = GetNumGroupMembers()
     local unitPrefix = IsInRaid() and "raid" or "party"
     
@@ -88,7 +95,7 @@ function TalentScanner:ScanGroup()
         local unit = unitPrefix .. i
         if i == members and not IsInRaid() then unit = "player" end -- player ya se hizo
         
-        if UnitExists(unit) and CanInspect(unit) then
+        if UnitExists(unit) and CanInspect(unit) and CheckInteractDistance(unit, 1) then
             self:RequestInspect(unit)
         end
         
