@@ -40,6 +40,7 @@ function ns.SmartSelection:GetAvailableDebuffs()
                 class = info.class,
                 priority = info.priority,
                 talentId = info.talentId,
+                talentMandatory = info.talentMandatory,
                 icon = spellIcon or info.icon
             })
         end

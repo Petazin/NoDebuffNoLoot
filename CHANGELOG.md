@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.7.0] - 2026-07-20
+
+### Added - v2.7.0
+- **Soporte para Toque Vampírico**: Añadido *Toque Vampírico* (Vampiric Touch, Rango 3, ID `34917`) a la base de datos de debuffs de Sacerdote de Sombras en TBC.
+- **Modo HUD Automático**: Añadida la opción "HUD Automático" (`autoHUD`) en las opciones de Blizzard. Si está activa, el HUD monitoriza dinámicamente y de forma pasiva el objetivo basándose en las clases presentes en el grupo actual sin necesidad de configuraciones manuales, ocultando los nombres de los jugadores.
+- **Desactivar Sincronización (Modo Local)**: Añadido checkbox "Desactivar Sincronización (Modo Local)" (`disableSync`) en las opciones. Desbloquea la interfaz de asignaciones para miembros comunes del grupo para que puedan configurar su HUD manualmente a nivel local, previniendo sobrescrituras de red.
+- **Botón Cargar Preset**: Añadido el botón "Cargar Preset" en la interfaz custom de asignaciones que limpia y autocompleta la lista con debuffs sugeridos para el grupo actual (y auto-asigna a los jugadores si son los únicos de su clase).
+
+### Fixed - v2.7.0
+- **Corrección de ID de Rugido Desmoralizador**: Se corrigió el Spell ID de *Rugido desmoralizador* de Druida que estaba apuntando erróneamente a `8983` (*Azote* / *Bash* de oso Rango 3, lo cual provocaba que se mostrara el nombre "Azote" e impidiera rastrear el debuff correcto). Ahora apunta al ID correcto `26998`.
+- **Filtro de Talentos en Preset**: Corregida la carga de presets para verificar que el jugador posea el talento correspondiente a debuffs obligatorios (`talentMandatory`), evitando que sea auto-asignado a hechizos que no tiene (como *Destrozar* o *Enjambre de insectos*). Se sincroniza y procesa el escaneo del propio jugador de manera instantánea al abrir el panel de configuración incluso si está solo o fuera de grupo. Además, si hay 2 o más jugadores de la misma clase en el grupo, el preset asigna inteligentemente el debuff (como *Destrozar*, *Fuego feérico mejorado*, o las versiones mejoradas del *Grito desmoralizador* y *Rugido desmoralizador*) al jugador que tenga el talento específico correspondiente, dejando el campo vacío en caso de que existan múltiples candidatos aptos para evitar selecciones aleatorias.
+
+---
+
 ## [2.6.5] - 2026-07-14
 
 ### Added - v2.6.5

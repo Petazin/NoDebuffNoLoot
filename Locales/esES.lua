@@ -81,5 +81,14 @@ L["OPT_ALERT_TOOLTIP_FORMAT"] = "|cFFFF8800¡Optimización Disponible!|r\nEl enc
 L["OPT_SCAN_ONLY_IN_INSTANCE"] = "Escanear solo en Instancia"
 L["OPT_SCAN_ONLY_IN_INSTANCE_DESC"] = "Limita el escaneo de talentos de grupo para que solo se realice dentro de Mazmorras y Bandas (Raid)."
 
+-- Auto-HUD & Local Presets v2.7.0
+L["OPT_AUTO_HUD"] = "Modo HUD Automático"
+L["OPT_AUTO_HUD_DESC"] = "Monitorea y muestra automáticamente los debuffs en base a las clases presentes en tu grupo/banda, sin requerir asignaciones manuales."
+L["OPT_DISABLE_SYNC"] = "Desactivar Sincronización (Modo Local)"
+L["OPT_DISABLE_SYNC_DESC"] = "Ignora las asignaciones enviadas por el líder de la banda y te permite editar tu configuración local de forma libre.\n\n|cFFFF3333ADVERTENCIA:|r Si está activo, NO recibirás las asignaciones ni cambios enviados por el líder de la banda. Tu HUD solo reflejará tus asignaciones locales manuales. ¡Úsalo con precaución en bandas de hermandad!"
+L["CONFIG_LOAD_PRESET"] = "Cargar Preset"
+L["LOAD_PRESET_SUCCESS"] = "Cargado preset por defecto para la composición actual."
+L["LOAD_PRESET_NO_PERMS"] = "No tienes permisos para modificar las asignaciones."
+
 
 

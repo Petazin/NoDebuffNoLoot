@@ -2,7 +2,7 @@
 ## Title: NoDebuffNoLoot
 ## Notes: Identifica debuffs faltantes en bosses y los asigna a jugadores específicos.
 ## Author: Antigravity & User
-## Version: 2.6.5
+## Version: 2.7.0
 ## X-Curse-Project-ID: 1449461
 ## SavedVariables: NoDebuffNoLootDB
 

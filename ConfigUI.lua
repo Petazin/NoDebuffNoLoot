@@ -5,6 +5,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("NoDebuffNoLoot")
 local mainFrame
 
 local function HasEditPermissions()
+    if NoDebuffNoLoot and NoDebuffNoLoot.db and NoDebuffNoLoot.db.profile.disableSync then return true end
     if not (IsInRaid() or IsInGroup()) then return true end
     
     local myName = UnitName("player")
@@ -707,6 +708,17 @@ function ns.ConfigUI:Init()
     end)
     mainFrame.annBtn = annBtn
     
+    local loadPresetBtn = CreateFrame("Button", nil, mainFrame, "UIPanelButtonTemplate")
+    loadPresetBtn:SetSize(120, 25)
+    loadPresetBtn:SetPoint("BOTTOMLEFT", 280, 10)
+    loadPresetBtn:SetText(L["CONFIG_LOAD_PRESET"] or "Cargar Preset")
+    loadPresetBtn:SetScript("OnClick", function()
+        if ns.Assignments and ns.Assignments.LoadPreset then
+            ns.Assignments:LoadPreset()
+        end
+    end)
+    mainFrame.loadPresetBtn = loadPresetBtn
+    
     -- UI de Delegado
     local delegateLbl = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     delegateLbl:SetPoint("BOTTOMRIGHT", -180, 15)
@@ -745,9 +757,11 @@ function ns.ConfigUI:Refresh()
     if hasPerms then
         mainFrame.addBtn:Enable()
         mainFrame.annBtn:Enable()
+        if mainFrame.loadPresetBtn then mainFrame.loadPresetBtn:Enable() end
     else
         mainFrame.addBtn:Disable()
         mainFrame.annBtn:Disable()
+        if mainFrame.loadPresetBtn then mainFrame.loadPresetBtn:Disable() end
     end
     
     -- Solo el líder del grupo/banda o asistentes pueden delegar permisos (el propio delegado no puede delegar a otro)

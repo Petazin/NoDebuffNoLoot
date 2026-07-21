@@ -74,6 +74,12 @@ end
 
 -- Función para que Roster llame a inspeccionar a todos gradualmente
 function TalentScanner:ScanGroup()
+    -- Inspeccionamos al jugador mismo siempre (incluso fuera de grupo)
+    local playerGUID = UnitGUID("player")
+    if playerGUID then
+        self:ProcessInspect(playerGUID)
+    end
+
     if not IsInGroup() then return end
     
     -- Si la opción scanOnlyInInstance está activa, comprobar si estamos en instancia (mazmorra o banda)
@@ -85,9 +91,6 @@ function TalentScanner:ScanGroup()
     
     local members = GetNumGroupMembers()
     local unitPrefix = IsInRaid() and "raid" or "party"
-    
-    -- Inspeccionamos al jugador mismo siempre
-    self:ProcessInspect(UnitGUID("player"))
 
     -- Para los demás, usamos un ticker para no saturar
     local i = 1

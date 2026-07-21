@@ -32,6 +32,7 @@ local defaults = {
         },
         delegate = "", -- Nombre del Co-Asignador Delegado
         scanOnlyInInstance = false,
+        disableSync = false,
         hud = {
             shown = true,
             alwaysShow = false,
@@ -44,6 +45,7 @@ local defaults = {
             filterMine = false,
             onlyMissing = false,
             bossOnly = false,
+            autoHUD = false,
         },
         alerts = {
             chat = true,
@@ -175,53 +177,77 @@ function NoDebuffNoLoot:UpdateTracker()
         end
     end
 
-    -- 2. Actualizar el HUD basado en la nueva lista ordenada de asignaciones
-    for _, assignment in ipairs(self.db.profile.assignments) do
-        local debuffId = assignment.spellId
-        local assignedPlayer = assignment.primary
-        local backupPlayer = assignment.backup
+    -- 2. Determinar la lista de hechizos a mostrar en el HUD
+    local orderedSpells = {}
+    local spellSource = {} -- [debuffId] = { primary = "", backup = "", combatDelay = 3 }
+    
+    if self.db.profile.hud.autoHUD then
+        local available = ns.SmartSelection:GetAvailableDebuffs()
+        for _, debuff in ipairs(available) do
+            table.insert(orderedSpells, debuff.id)
+            spellSource[debuff.id] = { primary = "", backup = "", combatDelay = 3 }
+        end
+    else
+        for _, assignment in ipairs(self.db.profile.assignments) do
+            local debuffId = assignment.spellId
+            if debuffId then
+                table.insert(orderedSpells, debuffId)
+                spellSource[debuffId] = {
+                    primary = assignment.primary or "",
+                    backup = assignment.backup or "",
+                    combatDelay = tonumber(assignment.combatDelay) or 3
+                }
+            end
+        end
+    end
+    self.activeTrackerSpells = orderedSpells
+
+    -- 3. Actualizar el HUD basado en la lista ordenada determinada
+    for _, debuffId in ipairs(orderedSpells) do
+        local info = spellSource[debuffId]
+        local assignedPlayer = info.primary
+        local backupPlayer = info.backup
         
-        -- Asegurar que debuffId exista
-        if debuffId then
-            local debuffName = GetSpellInfo(debuffId)
-            local icon = GetSpellTexture(debuffId)
-            
-            -- Buscar si el debuff está activo en el objetivo (por ID o por coincidencia de nombre localizado)
-            local activeData = activeDebuffs[debuffId]
-            if not activeData and debuffName then
-                activeData = activeDebuffs[string.lower(debuffName)]
-            end
+        local debuffName = GetSpellInfo(debuffId)
+        local icon = GetSpellTexture(debuffId)
+        
+        -- Buscar si el debuff está activo en el objetivo (por ID o por coincidencia de nombre localizado)
+        local activeData = activeDebuffs[debuffId]
+        if not activeData and debuffName then
+            activeData = activeDebuffs[string.lower(debuffName)]
+        end
 
-            -- Smart Overwrite: Expose Armor overrides Sunder Armor requirement
-            if debuffId == 25225 and not activeData then --> 25225 = Sunder Armor
-                local exposeName = GetSpellInfo(8647)
-                if exposeName and activeDebuffs[string.lower(exposeName)] then
-                    activeData = activeDebuffs[string.lower(exposeName)]
-                end
+        -- Smart Overwrite: Expose Armor overrides Sunder Armor requirement
+        if debuffId == 25225 and not activeData then --> 25225 = Sunder Armor
+            local exposeName = GetSpellInfo(8647)
+            if exposeName and activeDebuffs[string.lower(exposeName)] then
+                activeData = activeDebuffs[string.lower(exposeName)]
             end
-            
-            -- Smart Overwrite: Demoralizing Shout (Guerrero) y Demoralizing Roar (Druida) se satisfacen mutuamente
-            if debuffId == 25203 and not activeData then --> 25203 = Demoralizing Shout
-                local roarName = GetSpellInfo(8983)
-                if roarName and activeDebuffs[string.lower(roarName)] then
-                    activeData = activeDebuffs[string.lower(roarName)]
-                end
-            elseif debuffId == 8983 and not activeData then --> 8983 = Demoralizing Roar
-                local shoutName = GetSpellInfo(25203)
-                if shoutName and activeDebuffs[string.lower(shoutName)] then
-                    activeData = activeDebuffs[string.lower(shoutName)]
-                end
+        end
+        
+        -- Smart Overwrite: Demoralizing Shout (Guerrero) y Demoralizing Roar (Druida) se satisfacen mutuamente
+        if debuffId == 25203 and not activeData then --> 25203 = Demoralizing Shout
+            local roarName = GetSpellInfo(8983)
+            if roarName and activeDebuffs[string.lower(roarName)] then
+                activeData = activeDebuffs[string.lower(roarName)]
             end
+        elseif debuffId == 8983 and not activeData then --> 8983 = Demoralizing Roar
+            local shoutName = GetSpellInfo(25203)
+            if shoutName and activeDebuffs[string.lower(shoutName)] then
+                activeData = activeDebuffs[string.lower(shoutName)]
+            end
+        end
 
-            -- Si no validamos playerName, se muestra todo (según filtro)
-            -- Validar si el encargado tiene la clase correcta
-            local talentOk = true
+        -- Validaciones de clase y talento (solo si no es autoHUD y hay asignado)
+        local talentOk = true
+        local hasTalent = false
+        
+        if not self.db.profile.hud.autoHUD then
             if ns.SmartSelection and ns.SmartSelection.Validate then
                 talentOk = ns.SmartSelection:Validate(assignedPlayer, debuffId)
             end
             
             -- Detectar si el encargado posee el talento de mejora
-            local hasTalent = false
             if ns.TalentScanner and assignedPlayer and assignedPlayer ~= "" then
                 local debuffInfo = nil
                 for name, info in pairs(ns.Data.Debuffs) do
@@ -231,69 +257,75 @@ function NoDebuffNoLoot:UpdateTracker()
                     hasTalent = ns.TalentScanner:HasTalent(assignedPlayer, debuffInfo.talentId) == true
                 end
             end
+        end
 
-            -- Si no validamos playerName, se muestra todo (según filtro)
-            if not self.db.profile.hud.filterMine or assignedPlayer == playerName or backupPlayer == playerName then
+        -- Determinar si mostrar según filtro
+        local shouldShow = false
+        if self.db.profile.hud.autoHUD then
+            shouldShow = true
+        elseif not self.db.profile.hud.filterMine or assignedPlayer == playerName or backupPlayer == playerName then
+            shouldShow = true
+        end
+
+        if shouldShow then
+            -- Inicializar el estado de alertas de este debuff si no existe (usamos el ID como key ahora)
+            alertStates[debuffId] = alertStates[debuffId] or { missing = false, expire = false }
+        
+            if not validTarget then
+                -- Mostrar HUD inactivo (IDLE) si no hay target pero está el override "alwaysShow"
+                ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
+                alertStates[debuffId].missing = false
+                alertStates[debuffId].expire = false
+            elseif activeData then
+                local timeLeft = activeData.expirationTime > 0 and (activeData.expirationTime - GetTime()) or 999
                 
-                -- Inicializar el estado de alertas de este debuff si no existe (usamos el ID como key ahora)
-                alertStates[debuffId] = alertStates[debuffId] or { missing = false, expire = false }
-            
-                if not validTarget then
-                    -- Mostrar HUD inactivo (IDLE) si no hay target pero está el override "alwaysShow"
-                    ns.UI:SetStatus(debuffId, debuffName, "IDLE", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
-                    alertStates[debuffId].missing = false
-                    alertStates[debuffId].expire = false
-                elseif activeData then
-                    local timeLeft = activeData.expirationTime > 0 and (activeData.expirationTime - GetTime()) or 999
-                    
-                    if self.db.profile.hud.onlyMissing then
-                        if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
-                    else
-                        ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon, not talentOk, hasTalent)
-                    end
-                    
-                    -- Alerta de expiración
-                    if (assignedPlayer == playerName or backupPlayer == playerName) and timeLeft < 5 then
-                        if not alertStates[debuffId].expire then
-                            UIErrorsFrame:AddMessage(string.format(L["ALERT_EXPIRE"], debuffName), 1.0, 1.0, 0.0)
-                            alertStates[debuffId].expire = true
-                        end
-                    elseif timeLeft >= 5 then
-                        alertStates[debuffId].expire = false
-                    end
-                    alertStates[debuffId].missing = false
+                if self.db.profile.hud.onlyMissing then
+                    if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
                 else
-                    local inCombat = InCombatLockdown()
-                    local delay = tonumber(assignment.combatDelay) or 3
-                    local inGracePeriod = inCombat and (GetTime() - combatStartTime < delay)
-
-                    if not inCombat or inGracePeriod then
-                        ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
-                        alertStates[debuffId].missing = false
-                    else
-                        ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
-                        
-                        -- Alerta de missing dura (solo a los encargados)
-                        if (assignedPlayer == playerName or backupPlayer == playerName) and not alertStates[debuffId].missing then
-                            UIErrorsFrame:AddMessage(string.format(L["ALERT_MISSING"], debuffName), 1.0, 0.0, 0.0)
-                            
-                            -- Chat Log Alert
-                            if self.db.profile.alerts.chat then
-                                self:Print(string.format(L["ALERT_MISSING"], debuffName))
-                            end
-
-                            if ns.UI and ns.UI.FlashScreen then
-                                 ns.UI:FlashScreen()
-                            end
-                            
-                            alertStates[debuffId].missing = true
-                        end
+                    ns.UI:SetStatus(debuffId, debuffName, "ACTIVE", timeLeft, assignedPlayer, backupPlayer, activeData.icon or icon, not talentOk, hasTalent)
+                end
+                
+                -- Alerta de expiración
+                if not self.db.profile.hud.autoHUD and (assignedPlayer == playerName or backupPlayer == playerName) and timeLeft < 5 then
+                    if not alertStates[debuffId].expire then
+                        UIErrorsFrame:AddMessage(string.format(L["ALERT_EXPIRE"], debuffName), 1.0, 1.0, 0.0)
+                        alertStates[debuffId].expire = true
                     end
+                elseif timeLeft >= 5 then
                     alertStates[debuffId].expire = false
                 end
+                alertStates[debuffId].missing = false
             else
-                if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
+                local inCombat = InCombatLockdown()
+                local delay = info.combatDelay
+                local inGracePeriod = inCombat and (GetTime() - combatStartTime < delay)
+
+                if not inCombat or inGracePeriod then
+                    ns.UI:SetStatus(debuffId, debuffName, "PENDING", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
+                    alertStates[debuffId].missing = false
+                else
+                    ns.UI:SetStatus(debuffId, debuffName, "MISSING", 0, assignedPlayer, backupPlayer, icon, not talentOk, hasTalent)
+                    
+                    -- Alerta de missing dura (solo a los encargados)
+                    if not self.db.profile.hud.autoHUD and (assignedPlayer == playerName or backupPlayer == playerName) and not alertStates[debuffId].missing then
+                        UIErrorsFrame:AddMessage(string.format(L["ALERT_MISSING"], debuffName), 1.0, 0.0, 0.0)
+                        
+                        -- Chat Log Alert
+                        if self.db.profile.alerts.chat then
+                            self:Print(string.format(L["ALERT_MISSING"], debuffName))
+                        end
+
+                        if ns.UI and ns.UI.FlashScreen then
+                             ns.UI:FlashScreen()
+                        end
+                        
+                        alertStates[debuffId].missing = true
+                    end
+                end
+                alertStates[debuffId].expire = false
             end
+        else
+            if ns.UI and ns.UI.HideRow then ns.UI:HideRow(debuffId) end
         end
     end
     

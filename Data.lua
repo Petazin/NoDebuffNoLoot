@@ -7,18 +7,18 @@ ns.Data.Debuffs = {
     -- GUERRERO
     ["Sunder Armor"] = { id = 25225, class = "WARRIOR", priority = "S", icon = "Interface\\Icons\\Ability_Warrior_Sunder" },
     ["Thunder Clap"] = { id = 25264, class = "WARRIOR", priority = "A", icon = "Interface\\Icons\\Spell_Nature_ThunderClap" },
-    ["Demoralizing Shout"] = { id = 25203, class = "WARRIOR", priority = "A", icon = "Interface\\Icons\\Ability_Warrior_WarCry" },
-    ["Blood Frenzy"] = { id = 29859, class = "WARRIOR", priority = "S", talentId = {1, 15}, icon = "Interface\\Icons\\Ability_Warrior_BloodFrenzy" },
+    ["Demoralizing Shout"] = { id = 25203, class = "WARRIOR", priority = "A", talentId = {2, 3}, icon = "Interface\\Icons\\Ability_Warrior_WarCry" },
+    ["Blood Frenzy"] = { id = 29859, class = "WARRIOR", priority = "S", talentId = {1, 15}, talentMandatory = true, icon = "Interface\\Icons\\Ability_Warrior_BloodFrenzy" },
     
     -- DRUIDA
     ["Faerie Fire"] = { id = 26993, class = "DRUID", priority = "S", talentId = {1, 16}, icon = "Interface\\Icons\\Spell_Nature_FaerieFire" },
-    ["Demoralizing Roar"] = { id = 8983, class = "DRUID", priority = "C", icon = "Interface\\Icons\\Ability_Druid_DemoralizingRoar" },
-    ["Mangle"] = { id = 33876, class = "DRUID", priority = "S", talentId = {2, 18}, icon = "Interface\\Icons\\Ability_Druid_Mangle" },
-    ["Insect Swarm"] = { id = 27013, class = "DRUID", priority = "B", talentId = {1, 10}, icon = "Interface\\Icons\\Spell_Nature_InsectSwarm" },
+    ["Demoralizing Roar"] = { id = 26998, class = "DRUID", priority = "C", talentId = {2, 2}, icon = "Interface\\Icons\\Ability_Druid_DemoralizingRoar" },
+    ["Mangle"] = { id = 33876, class = "DRUID", priority = "S", talentId = {2, 18}, talentMandatory = true, icon = "Interface\\Icons\\Ability_Druid_Mangle" },
+    ["Insect Swarm"] = { id = 27013, class = "DRUID", priority = "B", talentId = {1, 10}, talentMandatory = true, icon = "Interface\\Icons\\Spell_Nature_InsectSwarm" },
 
     -- CAZADOR
     ["Hunter's Mark"] = { id = 14325, class = "HUNTER", priority = "A", talentId = {2, 3}, icon = "Interface\\Icons\\Ability_Hunter_Snares" },
-    ["Expose Weakness"] = { id = 34503, class = "HUNTER", priority = "S", talentId = {3, 18}, icon = "Interface\\Icons\\Ability_Hunter_ExposeWeakness" },
+    ["Expose Weakness"] = { id = 34503, class = "HUNTER", priority = "S", talentId = {3, 18}, talentMandatory = true, icon = "Interface\\Icons\\Ability_Hunter_ExposeWeakness" },
     ["Scorpid Sting"] = { id = 3043, class = "HUNTER", priority = "B", icon = "Interface\\Icons\\Ability_Hunter_CriticalShot" },
     ["Screech"] = { id = 31480, class = "HUNTER", priority = "C", icon = "Interface\\Icons\\Ability_Hunter_Pet_Bat" },
 
@@ -26,8 +26,8 @@ ns.Data.Debuffs = {
     ["Expose Armor"] = { id = 8647, class = "ROGUE", priority = "A", talentId = {1, 5}, icon = "Interface\\Icons\\Ability_Rogue_ExposeArmor" },
 
     -- MAGO
-    ["Improved Scorch"] = { id = 22959, class = "MAGE", priority = "S", talentId = {2, 9}, icon = "Interface\\Icons\\Spell_Fire_SoulBurn" },
-    ["Winters Chill"] = { id = 12579, class = "MAGE", priority = "S", talentId = {3, 10}, icon = "Interface\\Icons\\Spell_Frost_IceFloes" },
+    ["Improved Scorch"] = { id = 22959, class = "MAGE", priority = "S", talentId = {2, 9}, talentMandatory = true, icon = "Interface\\Icons\\Spell_Fire_SoulBurn" },
+    ["Winters Chill"] = { id = 12579, class = "MAGE", priority = "S", talentId = {3, 10}, talentMandatory = true, icon = "Interface\\Icons\\Spell_Frost_IceFloes" },
 
     -- BRUJO
     ["Curse of Elements"] = { id = 27228, class = "WARLOCK", priority = "S", talentId = {1, 12}, icon = "Interface\\Icons\\Spell_Shadow_ChillTouch" },
@@ -37,8 +37,9 @@ ns.Data.Debuffs = {
     ["Curse of Doom"] = { id = 30910, class = "WARLOCK", priority = "B", icon = "Interface\\Icons\\Spell_Shadow_AuraOfDarkness" },
 
     -- SACERDOTE
-    ["Shadow Weaving"] = { id = 15258, class = "PRIEST", priority = "S", talentId = {3, 11}, icon = "Interface\\Icons\\Spell_Shadow_BlackPlague" },
-    ["Misery"] = { id = 33191, class = "PRIEST", priority = "S", talentId = {3, 18}, icon = "Interface\\Icons\\Spell_Shadow_Misery" },
+    ["Shadow Weaving"] = { id = 15258, class = "PRIEST", priority = "S", talentId = {3, 11}, talentMandatory = true, icon = "Interface\\Icons\\Spell_Shadow_BlackPlague" },
+    ["Misery"] = { id = 33191, class = "PRIEST", priority = "S", talentId = {3, 18}, talentMandatory = true, icon = "Interface\\Icons\\Spell_Shadow_Misery" },
+    ["Vampiric Touch"] = { id = 34917, class = "PRIEST", priority = "S", talentId = {3, 21}, talentMandatory = true, icon = "Interface\\Icons\\Spell_Holy_Stoicism" },
 
     -- CHAMÁN
     ["Stormstrike"] = { id = 17364, class = "SHAMAN", priority = "A", icon = "Interface\\Icons\\Spell_Holy_SealOfMight" },

@@ -81,5 +81,14 @@ L["OPT_ALERT_TOOLTIP_FORMAT"] = "|cFFFF8800Optimization Available!|r\nThe assign
 L["OPT_SCAN_ONLY_IN_INSTANCE"] = "Scan Only in Instance"
 L["OPT_SCAN_ONLY_IN_INSTANCE_DESC"] = "Limits group talent scanning to only perform inside Dungeons and Raids."
 
+-- Auto-HUD & Local Presets v2.7.0
+L["OPT_AUTO_HUD"] = "Auto-HUD Mode"
+L["OPT_AUTO_HUD_DESC"] = "Automatically tracks and displays active debuffs based on the classes present in your party/raid, without requiring manual assignments."
+L["OPT_DISABLE_SYNC"] = "Disable Sync (Local Mode)"
+L["OPT_DISABLE_SYNC_DESC"] = "Ignores assignments sent by the raid leader and allows you to freely edit your local configuration.\n\n|cFFFF3333WARNING:|r If active, you will NOT receive any assignments or changes sent by the raid leader. Your HUD will only show your manual local assignments. Use with caution in guild runs!"
+L["CONFIG_LOAD_PRESET"] = "Load Preset"
+L["LOAD_PRESET_SUCCESS"] = "Loaded default presets for current raid composition."
+L["LOAD_PRESET_NO_PERMS"] = "You do not have permissions to modify assignments."
+
 
 

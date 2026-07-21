@@ -299,14 +299,21 @@ end
 function UI:UpdateLayout()
     if not frame then return end
     
-    -- 1. Crear un set de IDs de hechizos asignados actualmente en la base de datos
+    -- 1. Crear un set de IDs de hechizos asignados actualmente en la base de datos o HUD automático
     local activeIds = {}
-    if NoDebuffNoLoot and NoDebuffNoLoot.db and NoDebuffNoLoot.db.profile.assignments then
-        for _, assignment in ipairs(NoDebuffNoLoot.db.profile.assignments) do
-            if assignment.spellId then
-                activeIds[assignment.spellId] = true
+    local orderedSpells = NoDebuffNoLoot.activeTrackerSpells
+    if not orderedSpells then
+        orderedSpells = {}
+        if NoDebuffNoLoot and NoDebuffNoLoot.db and NoDebuffNoLoot.db.profile.assignments then
+            for _, assignment in ipairs(NoDebuffNoLoot.db.profile.assignments) do
+                if assignment.spellId then
+                    table.insert(orderedSpells, assignment.spellId)
+                end
             end
         end
+    end
+    for _, spellId in ipairs(orderedSpells) do
+        activeIds[spellId] = true
     end
     
     -- 2. Ocultar cualquier fila en memoria cuyo ID ya no esté asignado
@@ -329,20 +336,17 @@ function UI:UpdateLayout()
     
     -- 3. Reposicionar las filas activas y visibles
     local i = 0
-    if NoDebuffNoLoot and NoDebuffNoLoot.db and NoDebuffNoLoot.db.profile.assignments then
-        for _, assignment in ipairs(NoDebuffNoLoot.db.profile.assignments) do
-            local debuffId = assignment.spellId
-            if debuffId and frame.rows[debuffId] then
-                local r = frame.rows[debuffId]
-                if r:IsShown() then
-                    r:ClearAllPoints()
-                    r:SetPoint("TOP", frame, "TOP", 0, -i * 20)
-                    r:SetWidth(width)
-                    if r.statusBar then
-                        r.statusBar:SetWidth(width - 25)
-                    end
-                    i = i + 1
+    for _, debuffId in ipairs(orderedSpells) do
+        if debuffId and frame.rows[debuffId] then
+            local r = frame.rows[debuffId]
+            if r:IsShown() then
+                r:ClearAllPoints()
+                r:SetPoint("TOP", frame, "TOP", 0, -i * 20)
+                r:SetWidth(width)
+                if r.statusBar then
+                    r.statusBar:SetWidth(width - 25)
                 end
+                i = i + 1
             end
         end
     end

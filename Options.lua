@@ -97,6 +97,32 @@ local options = {
                     order = 5.5,
                     width = "full",
                 },
+                autoHUD = {
+                    type = "toggle",
+                    name = L["OPT_AUTO_HUD"] or "HUD Automático",
+                    desc = L["OPT_AUTO_HUD_DESC"] or "Muestra automáticamente los debuffs en el objetivo basados en la composición de tu grupo/banda, sin necesidad de configuraciones manuales.",
+                    get = function() return NoDebuffNoLoot.db.profile.hud.autoHUD end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.hud.autoHUD = val
+                        NoDebuffNoLoot:UpdateTracker()
+                    end,
+                    order = 5.6,
+                    width = "full",
+                },
+                disableSync = {
+                    type = "toggle",
+                    name = L["OPT_DISABLE_SYNC"] or "Desactivar Sincronización (Modo Local)",
+                    desc = L["OPT_DISABLE_SYNC_DESC"] or "Ignora las asignaciones enviadas por el líder de la banda y te permite editar tu configuración local de forma libre.",
+                    get = function() return NoDebuffNoLoot.db.profile.disableSync end,
+                    set = function(_, val)
+                        NoDebuffNoLoot.db.profile.disableSync = val
+                        if ns.ConfigUI and ns.ConfigUI.Refresh then
+                            ns.ConfigUI:Refresh()
+                        end
+                    end,
+                    order = 5.7,
+                    width = "full",
+                },
                 scale = {
                     type = "range",
                     name = L["OPT_HUD_SCALE"] or "Escala del HUD",
