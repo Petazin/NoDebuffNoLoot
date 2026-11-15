@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [2.8.0] - 2026-08-28 (Archivado: 2026-11-15)
+
+### Status
+- **Estado del Proyecto**: Congelado / Archivado. Ciclo de desarrollo completado satisfactoriamente.
+
+### Added - v2.8.0
+- **Motor de Inspección y Sincronización Invisible V2 (Zero-Noise Engine)**:
+  - **Sincronización P2P por Addon Comms**: Intercambio de talentos vía canal de red (`NDNL_TALENTS`) al unirse al grupo o cambiar de spec, eliminando llamadas a `NotifyInspect` entre usuarios del addon.
+  - **Cola Circular No Bloqueante (Non-Dropping FIFO)**: Los jugadores fuera de rango (~28y) rotan al final de la cola para reintento automático cuando se acerquen.
+  - **Watchdog Timer (3.5s)**: Desbloqueo y recuperación automática de la cola ante faltas de respuesta `INSPECT_READY`.
+  - **Protección Total en Combate e Inspección**: Pausa absoluta de inspecciones si `InCombatLockdown()` o `InspectFrame:IsShown()`.
+  - **Supresión Total de Ruido y Logs**: Eliminación de impresiones residuales en chat y silenciado total de sonidos y textos de error de interfaz durante la inspección.
+
+---
+
 ## [2.7.0] - 2026-07-20
 
 ### Added - v2.7.0
