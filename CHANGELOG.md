@@ -4,10 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [2.8.0] - 2026-08-28 (Archivado: 2026-11-15)
-
-### Status
-- **Estado del Proyecto**: Congelado / Archivado. Ciclo de desarrollo completado satisfactoriamente.
+## [2.8.0] - 2026-08-28
 
 ### Added - v2.8.0
 - **Motor de Inspección y Sincronización Invisible V2 (Zero-Noise Engine)**:
